@@ -5,29 +5,45 @@
 <title>Admin Panel 🌴</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
-body { font-family:'Linotte',sans-serif; text-align:center; background:#f0f8ff; padding:30px; }
-input, button { padding:10px; margin:5px; border-radius:8px; }
+body {
+    font-family:'Linotte',sans-serif;
+    text-align:center;
+    background:#f0f8ff;
+    padding:30px;
+}
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    width: 360px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+input, button { padding:10px; margin:5px; border-radius:8px; width: 80%; }
 button { cursor:pointer; font-weight:bold; background:#ffb6b9; border:none; }
 button:hover { background:#ff8b94; }
 </style>
 </head>
 <body>
+
+<div class="card">
 <h2>🌴 Admin Panel</h2>
 <p>Current island visitors: <span id="visitorCount">0</span>/7</p>
 <input id="dodoInput" placeholder="Enter new Dodo Code">
 <button onclick="updateDodo()">Update Dodo Code</button>
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
 
-// Update visitor count live
-socket.on("queueUpdate", data=>{
+// Receive live queue updates to show visitor count
+socket.on("queueUpdate", data => {
     document.getElementById("visitorCount").innerText = data.activeCount;
 });
 
-// Update Dodo code from admin input
-function updateDodo(){
+// Send updated Dodo code to server
+function updateDodo() {
     const code = document.getElementById("dodoInput").value.trim();
     if(code) socket.emit("updateDodo", code);
 }
