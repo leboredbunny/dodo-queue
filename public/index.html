@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <title>🪻Daijoubu's Private Island Queue🪻</title>
 
-<!-- Load Linotte Bold from Google Fonts -->
+<!-- Google Fonts Linotte Bold -->
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 
 <style>
-/* Use Linotte Bold for entire site */
+/* Linotte Bold globally */
 * {
   font-family: 'Linotte', sans-serif !important;
   font-weight: bold !important;
@@ -16,11 +16,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  margin:0; padding:0;
-  text-align:center;
-  background:url('bg.jpg') no-repeat center center fixed;
-  background-size:cover;
+body { margin:0; padding:0; text-align:center;
+  background:url('bg.jpg') no-repeat center center fixed; background-size:cover;
 }
 
 .card{
@@ -185,6 +182,14 @@ footer img{width:24px; height:24px;}
   </p>
 </div>
 
+<!-- Turnip Prices Card -->
+<div class="card" id="turnipCard" style="display:none;">
+  <h2>💰 Turnip Prices</h2>
+  <img id="turnipLogo" src="turnip.png" alt="Turnip Logo" style="width:60px;height:60px;"><br>
+  <p id="turnipPrice">Loading price...</p>
+  <button id="updateTurnipBtn" style="display:none;">Update Price</button>
+</div>
+
 <footer>
   <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank">
     <img src="kofi-logo.png">☕ Private Treasure Islands
@@ -200,16 +205,14 @@ const socket = io();
 let userId = localStorage.getItem("queueUserId");
 
 function openAbout(){document.getElementById("aboutModal")?.style.display="block";}
-function closeRules(){
-  document.getElementById("rulesModal").style.display="none";
-  localStorage.setItem("rulesSeen","true");
-}
+function closeRules(){document.getElementById("rulesModal").style.display="none"; localStorage.setItem("rulesSeen","true");}
 
 function showQueueUI(){
   document.getElementById("login").style.display="none";
   document.getElementById("queue").style.display="block";
   document.getElementById("mapsSection").style.display="block";
   document.getElementById("guestbook").style.display="block";
+  document.getElementById("turnipCard").style.display="block";
 }
 
 function login(){
@@ -217,7 +220,6 @@ function login(){
   const visitorIsland = document.getElementById("visitorIsland").value.trim();
   const visitorPassword = document.getElementById("visitorPassword").value.trim();
   if(!username || !visitorIsland || !visitorPassword){alert("Fill all fields"); return;}
-
   fetch("/login",{method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({username,visitorIsland,visitorPassword})})
@@ -231,7 +233,7 @@ function login(){
     });
 }
 
-// Queue update
+// Queue updates
 socket.on("queueUpdate",(data)=>{
   const user = data.users.find(u=>u.userId===userId);
   if(!user) return;
@@ -241,12 +243,14 @@ socket.on("queueUpdate",(data)=>{
   bar.style.width = percent+"%";
   bar.style.background = data.activeCount>=7?"red":"green";
   document.getElementById("progressText").innerText=data.activeCount+"/7 Visitors";
+
+  // Show Dodo code only if active
   if(user.active){
     document.getElementById("status").innerText="🎉 You're on the island!";
-    document.getElementById("code").innerText="Dodo Code: "+data.dodoCode;
+    document.getElementById("code").innerText="Dodo Code: "+data.dodoCodeDisplay;
   } else {
     document.getElementById("status").innerText="🌼 Waiting in queue...";
-    document.getElementById("code").innerText="";
+    document.getElementById("code").innerText=data.dodoCodeDisplay || "Oops! The island is currently full, please wait until someone leaves!";
   }
 });
 
@@ -259,7 +263,6 @@ function submitComment(){
   socket.emit("newComment",{userId,username,island,comment});
   document.getElementById("commentText").value="";
 }
-
 socket.on("updateComments",(comments)=>{
   const box = document.getElementById("commentsList");
   box.innerHTML="";
@@ -283,6 +286,21 @@ document.getElementById("leaveBtn").onclick=()=>{
   socket.emit("leaveIsland",userId);
   localStorage.removeItem("queueUserId");
   location.reload();
+};
+
+// Turnip Prices
+const turnipPriceEl = document.getElementById("turnipPrice");
+const updateBtn = document.getElementById("updateTurnipBtn");
+
+socket.on("turnipPriceUpdate",(price)=>{
+  turnipPriceEl.innerText = `Today's price: ${price} Bells`;
+});
+
+// Admin update
+updateBtn.onclick = ()=>{
+  const price = prompt("Enter today's turnip price:");
+  if(!price) return;
+  socket.emit("updateTurnipPrice",price,"admin123"); // admin password
 };
 </script>
 </body>
