@@ -3,74 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <title>🪻Daijoubu's Private Island Queue🪻</title>
-<link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
+/* 1️⃣ Linotte Bold Setup */
+@font-face {
+  font-family: 'Linotte';
+  src: url('fonts/Linotte-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* 2️⃣ Force entire site to use Linotte Bold */
+* {
+  font-family: 'Linotte', sans-serif !important;
+  font-weight: bold !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  font-family: 'Linotte', sans-serif;
   margin:0; padding:0;
   text-align:center;
   background:url('bg.jpg') no-repeat center center fixed;
   background-size:cover;
 }
+
 .card{
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.9);
   width:360px;
-  margin:80px auto 120px;
-  padding:30px;
+  margin:40px auto;
+  padding:25px;
   border-radius:25px;
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
+
 input{
   padding:10px;
   margin:8px 0;
   border-radius:10px;
   border:1px solid #ccc;
-  width:80%;
-  box-sizing:border-box;
+  width:85%;
 }
+
 button{
   background:#ffb6b9;
   border:none;
-  padding:12px 22px;
+  padding:10px 18px;
   border-radius:12px;
   cursor:pointer;
   font-weight:bold;
-  margin-top:10px;
-  transition:0.2s;
 }
 button:hover{background:#ff8b94;}
-@media(max-width:500px){.card{width:90%; margin:40px auto; padding:20px;}}
 
 header{
   width:100%;
   padding:15px;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.9);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
-header h1{margin:0;}
-header button{
-  border:none; background:#ffd700; padding:8px 14px;
-  border-radius:10px; font-weight:bold; cursor:pointer;
+
+.progress-container{
+  background: #ddd;
+  border-radius: 20px;
+  height: 20px;
+  overflow: hidden;
+  margin-top: 10px;
 }
-header button:hover{background:#ffcc00;}
+.progress-bar{
+  height: 100%;
+  width: 0%;
+  background: green;
+  transition: 0.3s;
+}
+
+.comment-box{
+  text-align:left;
+  max-height:200px;
+  overflow-y:auto;
+  margin-bottom:10px;
+}
+.comment-item{
+  background:#f5f5f5;
+  padding:8px;
+  border-radius:10px;
+  margin-bottom:8px;
+}
 
 #rulesModal, #aboutModal{
   display:none;
-  position:fixed; top:0; left:0;
+  position:fixed;
+  top:0; left:0;
   width:100%; height:100%;
   background: rgba(0,0,0,0.7);
   z-index:9999;
-  text-align:center;
 }
 #rulesModal div, #aboutModal div{
   background:#fff; padding:30px; border-radius:20px;
-  margin:100px auto;
-  width:90%; max-width:400px;
-  box-shadow:0 10px 20px rgba(0,0,0,0.3);
-  cursor:move; position:relative;
+  margin:100px auto; width:90%; max-width:400px;
 }
 #rulesModal button, #aboutModal button{
   border:none; padding:12px 20px;
@@ -95,19 +125,6 @@ footer a{
 }
 footer a:hover{background:#ffeb99;}
 footer img{width:24px; height:24px;}
-
-.toast{
-  position:fixed; top:20px; right:20px;
-  background:#4CAF50; color:#fff; padding:12px 20px;
-  border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3);
-  z-index:10000; animation:fadeinout 3s forwards;
-}
-@keyframes fadeinout{
-0%{opacity:0; transform:translateY(-20px);}
-10%{opacity:1; transform:translateY(0);}
-90%{opacity:1;}
-100%{opacity:0; transform:translateY(-20px);}
-}
 </style>
 </head>
 <body>
@@ -145,19 +162,31 @@ footer img{width:24px; height:24px;}
 <div class="card" id="queue" style="display:none;">
   <h2 id="status"></h2>
   <p id="position"></p>
-  <p id="waitTime"></p>
-  <p id="islandCount"></p>
+
+  <!-- Green/Red Progress Bar -->
+  <div class="progress-container">
+    <div id="progressBar" class="progress-bar"></div>
+  </div>
+  <p id="progressText">0/7 Visitors</p>
+
   <h3 id="code"></h3>
   <button id="copyBtn">📋 Copy Dodo Code</button><br>
   <button id="leaveBtn">Leave Island</button>
 </div>
 
-<!-- NEW TREASURE MAPS SECTION -->
+<!-- Guestbook Section -->
+<div class="card" id="commentSection" style="display:none;">
+  <h3>🌴 Visitor Guestbook</h3>
+  <div id="commentsList" class="comment-box"></div>
+  <input id="commentText" placeholder="Leave a comment about your visit">
+  <button onclick="submitComment()">Post</button>
+</div>
+
+<!-- Treasure Maps Section -->
 <div class="card" id="mapsSection" style="display:none;">
   <h2>🗺️ Treasure Island Maps</h2>
   <p>
-    <a id="mapsLink" href="#" target="_blank" 
-    style="font-weight:bold; color:#ff8b94;">
+    <a id="mapsLink" href="#" target="_blank" style="font-weight:bold; color:#ff8b94;">
       🌴 View My Treasure Island Maps
     </a>
   </p>
@@ -175,13 +204,10 @@ footer img{width:24px; height:24px;}
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
-let userId;
+let userId = localStorage.getItem("queueUserId");
 
 const imgurLink = "https://imgur.com/a/maps-BVMEz0p";
-
-if(imgurLink){
-  document.getElementById("mapsLink").href = imgurLink;
-}
+document.getElementById("mapsLink").href = imgurLink;
 
 window.onload = () => {
   if(!localStorage.getItem("rulesSeen")){
@@ -195,54 +221,87 @@ function closeRules(){
   localStorage.setItem("rulesSeen","true");
 }
 
+function showQueueUI(){
+  document.getElementById("login").style.display="none";
+  document.getElementById("queue").style.display="block";
+  document.getElementById("mapsSection").style.display="block";
+  document.getElementById("commentSection").style.display="block";
+}
+
 function login(){
   const username = document.getElementById("username").value.trim();
   const visitorIsland = document.getElementById("visitorIsland").value.trim();
   const visitorPassword = document.getElementById("visitorPassword").value.trim();
-  if(!username || !visitorIsland || !visitorPassword){
-    alert("Fill all fields"); return;
-  }
+  if(!username || !visitorIsland || !visitorPassword){alert("Fill all fields"); return;}
+
   fetch("/login",{method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({username,visitorIsland,visitorPassword})})
-  .then(res=>res.json()).then(data=>{
-    if(data.success){
-      userId = crypto.randomUUID();
-      document.getElementById("login").style.display="none";
-      document.getElementById("queue").style.display="block";
-      document.getElementById("mapsSection").style.display="block";
-      socket.emit("joinQueue",{userId,username,visitorIsland,visitorPassword});
-    } else alert("Incorrect credentials");
-  });
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({username,visitorIsland,visitorPassword})})
+    .then(res=>res.json()).then(data=>{
+      if(data.success){
+        userId = crypto.randomUUID();
+        localStorage.setItem("queueUserId", userId);
+        showQueueUI();
+        socket.emit("joinQueue",{userId,username,visitorIsland,visitorPassword});
+      } else alert("Incorrect credentials");
+    });
 }
 
+// Queue update
 socket.on("queueUpdate",(data)=>{
   const user = data.users.find(u=>u.userId===userId);
   if(!user) return;
 
   document.getElementById("position").innerText="Position: "+user.position;
-  document.getElementById("islandCount").innerText="Island: "+data.activeCount+"/7 visitors";
+
+  const percent = (data.activeCount/7)*100;
+  const bar = document.getElementById("progressBar");
+  bar.style.width = percent+"%";
+  bar.style.background = data.activeCount>=7?"red":"green";
+  document.getElementById("progressText").innerText=data.activeCount+"/7 Visitors";
 
   if(user.active){
     document.getElementById("status").innerText="🎉 You're on the island!";
     document.getElementById("code").innerText="Dodo Code: "+data.dodoCode;
-    document.getElementById("waitTime").innerText="";
   } else {
     document.getElementById("status").innerText="🌼 Waiting in queue...";
     document.getElementById("code").innerText="";
   }
-
-  document.getElementById("visitorCountDisplay").innerText=
-  "Visitors on island: "+data.activeCount+"/7";
 });
 
-document.getElementById("copyBtn").onclick = ()=>{
-  const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
+// Guestbook comments
+function submitComment(){
+  const comment = document.getElementById("commentText").value.trim();
+  if(!comment) return alert("Write something!");
+  const username = document.getElementById("username").value.trim();
+  const island = document.getElementById("visitorIsland").value.trim();
+  socket.emit("newComment",{userId,username,island,comment});
+  document.getElementById("commentText").value="";
+}
+
+socket.on("updateComments",(comments)=>{
+  const box = document.getElementById("commentsList");
+  box.innerHTML="";
+  comments.forEach(c=>{
+    box.innerHTML+=`
+      <div class="comment-item">
+        <strong>${c.username}</strong> (${c.island})<br>
+        ${c.comment}
+      </div>`;
+  });
+});
+
+// Copy Dodo code
+document.getElementById("copyBtn").onclick=()=>{
+  const code=document.getElementById("code").innerText.replace("Dodo Code: ","");
   if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
 };
 
-document.getElementById("leaveBtn").onclick = ()=>{
+// Leave island
+document.getElementById("leaveBtn").onclick=()=>{
   socket.emit("leaveIsland",userId);
+  localStorage.removeItem("queueUserId");
+  location.reload();
 };
 </script>
 </body>
