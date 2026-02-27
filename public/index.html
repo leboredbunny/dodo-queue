@@ -3,126 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <title>🪻Daijoubu's Private Island Queue🪻</title>
-
-<!-- Google Fonts Linotte Bold -->
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
-
 <style>
-/* Linotte Bold globally */
-* {
-  font-family: 'Linotte', sans-serif !important;
-  font-weight: bold !important;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body { margin:0; padding:0; text-align:center;
-  background:url('bg.jpg') no-repeat center center fixed; background-size:cover;
-}
-
-.card{
-  background: rgba(255,255,255,0.9);
-  width:360px;
-  margin:40px auto;
-  padding:25px;
-  border-radius:25px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
-}
-
-input{
-  padding:10px;
-  margin:8px 0;
-  border-radius:10px;
-  border:1px solid #ccc;
-  width:85%;
-}
-
-button{
-  background:#ffb6b9;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  cursor:pointer;
-}
+* { font-family: 'Linotte', sans-serif !important; font-weight: bold !important; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { margin:0; padding:0; text-align:center; background:url('bg.jpg') no-repeat center center fixed; background-size:cover; }
+.card{ background: rgba(255,255,255,0.9); width:360px; margin:40px auto; padding:25px; border-radius:25px; box-shadow:0 10px 25px rgba(0,0,0,0.2);}
+input{ padding:10px; margin:8px 0; border-radius:10px; border:1px solid #ccc; width:85%; }
+button{ background:#ffb6b9; border:none; padding:10px 18px; border-radius:12px; cursor:pointer;}
 button:hover{background:#ff8b94;}
-
-header{
-  width:100%;
-  padding:15px;
-  background: rgba(255,255,255,0.9);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.progress-container{
-  background: #ddd;
-  border-radius: 20px;
-  height: 20px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-.progress-bar{
-  height: 100%;
-  width: 0%;
-  background: green;
-  transition: 0.3s;
-}
-
-.comment-box{
-  text-align:left;
-  max-height:200px;
-  overflow-y:auto;
-  margin-bottom:10px;
-}
-.comment-item{
-  background:#f5f5f5;
-  padding:8px;
-  border-radius:10px;
-  margin-bottom:8px;
-}
-
-#rulesModal{
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.7);
-  z-index:9999;
-}
-#rulesModal div{
-  background:#fff; padding:30px; border-radius:20px;
-  margin:100px auto; width:90%; max-width:400px;
-}
-#rulesModal button{
-  border:none; padding:12px 20px;
-  border-radius:12px; background:#ffb6b9;
-  cursor:pointer; transition:0.2s;
-}
-#rulesModal button:hover{background:#ff8b94;}
-#rulesModal a{color:#ff8b94; font-weight:bold; text-decoration:none;}
-#rulesModal a:hover{text-decoration:underline;}
-
-footer{
-  width:100%; background:#ffd700; padding:12px 0;
-  display:flex; justify-content:center; gap:20px;
-  box-shadow:0 -4px 10px rgba(0,0,0,0.2);
-  position:fixed; bottom:0;
-}
-footer a{
-  display:flex; align-items:center; gap:8px;
-  text-decoration:none; color:#000; background:#fff; padding:8px 12px; border-radius:12px;
-  transition:0.2s;
-}
+header{ width:100%; padding:15px; background: rgba(255,255,255,0.9); display:flex; justify-content:space-between; align-items:center;}
+.progress-container{ background: #ddd; border-radius: 20px; height: 20px; overflow: hidden; margin-top: 10px;}
+.progress-bar{ height: 100%; width: 0%; background: green; transition: 0.3s;}
+.comment-box{ text-align:left; max-height:200px; overflow-y:auto; margin-bottom:10px;}
+.comment-item{ background:#f5f5f5; padding:8px; border-radius:10px; margin-bottom:8px;}
+#rulesModal, #aboutModal{ display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index:9999;}
+#rulesModal div, #aboutModal div{ background:#fff; padding:30px; border-radius:20px; margin:100px auto; width:90%; max-width:400px; box-shadow:0 10px 20px rgba(0,0,0,0.3);}
+#rulesModal button, #aboutModal button{ border:none; padding:12px 20px; border-radius:12px; background:#ffb6b9; cursor:pointer; transition:0.2s;}
+#rulesModal button:hover, #aboutModal button:hover{background:#ff8b94;}
+#rulesModal a, #aboutModal a{color:#ff8b94; font-weight:bold; text-decoration:none;}
+#rulesModal a:hover, #aboutModal a:hover{text-decoration:underline;}
+footer{ width:100%; background:#ffd700; padding:12px 0; display:flex; justify-content:center; gap:20px; box-shadow:0 -4px 10px rgba(0,0,0,0.2); position:fixed; bottom:0;}
+footer a{ display:flex; align-items:center; gap:8px; text-decoration:none; color:#000; background:#fff; padding:8px 12px; border-radius:12px; transition:0.2s;}
 footer a:hover{background:#ffeb99;}
 footer img{width:24px; height:24px;}
+.toast{position:fixed; top:20px; right:20px; background:#4CAF50; color:#fff; padding:12px 20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); z-index:10000; animation:fadeinout 3s forwards;}
+@keyframes fadeinout{0%{opacity:0; transform:translateY(-20px);}10%{opacity:1; transform:translateY(0);}90%{opacity:1;}100%{opacity:0; transform:translateY(-20px);}}
 </style>
 </head>
 <body>
 
 <header>
   <h1>🌸Private Island Queue🌸</h1>
-  <button onclick="openAbout()">ℹ️ About / Island Maps</button>
+  <button onclick="openRules()">ℹ️ Island Rules</button>
 </header>
 
 <!-- Rules Modal -->
@@ -164,7 +76,7 @@ footer img{width:24px; height:24px;}
   <button id="leaveBtn">Leave Island</button>
 </div>
 
-<!-- Guestbook Card -->
+<!-- Guestbook -->
 <div class="card" id="guestbook" style="display:none; max-height:300px; overflow-y:auto;">
   <h2>🌸 Visitor Guestbook</h2>
   <div id="commentsList" class="comment-box"></div>
@@ -172,17 +84,13 @@ footer img{width:24px; height:24px;}
   <button onclick="submitComment()">Post</button>
 </div>
 
-<!-- Treasure Maps Card -->
+<!-- Treasure Maps -->
 <div class="card" id="mapsSection" style="display:none;">
   <h2>🗺️ Treasure Island Maps</h2>
-  <p>
-    <a id="mapsLink" href="https://imgur.com/a/maps-BVMEz0p" target="_blank" style="font-weight:bold; color:#ff8b94;">
-      🌴 View My Treasure Island Maps
-    </a>
-  </p>
+  <p><a id="mapsLink" href="https://imgur.com/a/maps-BVMEz0p" target="_blank" style="font-weight:bold; color:#ff8b94;">🌴 View My Treasure Island Maps</a></p>
 </div>
 
-<!-- Turnip Prices Card -->
+<!-- Turnip Prices -->
 <div class="card" id="turnipCard" style="display:none;">
   <h2>💰 Turnip Prices</h2>
   <img id="turnipLogo" src="turnip.png" alt="Turnip Logo" style="width:60px;height:60px;"><br>
@@ -191,12 +99,8 @@ footer img{width:24px; height:24px;}
 </div>
 
 <footer>
-  <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank">
-    <img src="kofi-logo.png">☕ Private Treasure Islands
-  </a>
-  <a href="https://discord.gg/YXfmSWuKQT" target="_blank">
-    <img src="discord-logo.png">💬 Join my Community
-  </a>
+  <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank"><img src="kofi-logo.png" alt="Ko-fi Logo">☕ Private Treasure Islands</a>
+  <a href="https://discord.gg/YXfmSWuKQT" target="_blank"><img src="discord-logo.png" alt="Discord Logo">💬 Join my Community</a>
 </footer>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -204,9 +108,11 @@ footer img{width:24px; height:24px;}
 const socket = io();
 let userId = localStorage.getItem("queueUserId");
 
-function openAbout(){document.getElementById("aboutModal")?.style.display="block";}
+// --- Rules modal ---
+function openRules(){document.getElementById("rulesModal").style.display="block";}
 function closeRules(){document.getElementById("rulesModal").style.display="none"; localStorage.setItem("rulesSeen","true");}
 
+// --- Queue UI ---
 function showQueueUI(){
   document.getElementById("login").style.display="none";
   document.getElementById("queue").style.display="block";
@@ -215,15 +121,17 @@ function showQueueUI(){
   document.getElementById("turnipCard").style.display="block";
 }
 
+// --- Login ---
 function login(){
   const username = document.getElementById("username").value.trim();
   const visitorIsland = document.getElementById("visitorIsland").value.trim();
   const visitorPassword = document.getElementById("visitorPassword").value.trim();
   if(!username || !visitorIsland || !visitorPassword){alert("Fill all fields"); return;}
-  fetch("/login",{method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({username,visitorIsland,visitorPassword})})
-    .then(res=>res.json()).then(data=>{
+
+  fetch("/login",{method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({username,visitorIsland,visitorPassword})})
+    .then(res=>res.json())
+    .then(data=>{
       if(data.success){
         userId = crypto.randomUUID();
         localStorage.setItem("queueUserId",userId);
@@ -233,28 +141,51 @@ function login(){
     });
 }
 
-// Queue updates
+// --- Queue updates ---
 socket.on("queueUpdate",(data)=>{
   const user = data.users.find(u=>u.userId===userId);
   if(!user) return;
   document.getElementById("position").innerText="Position: "+user.position;
+
   const percent = (data.activeCount/7)*100;
   const bar = document.getElementById("progressBar");
   bar.style.width = percent+"%";
   bar.style.background = data.activeCount>=7?"red":"green";
   document.getElementById("progressText").innerText=data.activeCount+"/7 Visitors";
 
-  // Show Dodo code only if active
   if(user.active){
     document.getElementById("status").innerText="🎉 You're on the island!";
-    document.getElementById("code").innerText="Dodo Code: "+data.dodoCodeDisplay;
+    document.getElementById("code").innerText="Dodo Code: "+user.dodoCodeDisplay;
   } else {
     document.getElementById("status").innerText="🌼 Waiting in queue...";
-    document.getElementById("code").innerText=data.dodoCodeDisplay || "Oops! The island is currently full, please wait until someone leaves!";
+    document.getElementById("code").innerText=user.dodoCodeDisplay;
+  }
+
+  // --- Reminder after 10 min ---
+  if(user.active){
+    if(!user.reminderSent){
+      setTimeout(()=>{
+        alert("⏰ Reminder: Please click 'Leave Island' if you have finished, so others can join.");
+        user.reminderSent = true;
+      },10*60*1000);
+    }
   }
 });
 
-// Guestbook
+// --- Copy Dodo code ---
+document.getElementById("copyBtn").onclick=()=>{
+  const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
+  if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
+};
+
+// --- Leave Island ---
+document.getElementById("leaveBtn").onclick=()=>{
+  socket.emit("leaveIsland",userId);
+  localStorage.removeItem("queueUserId");
+  location.reload();
+};
+
+// --- Guestbook ---
 function submitComment(){
   const comment = document.getElementById("commentText").value.trim();
   if(!comment) return alert("Write something!");
@@ -267,40 +198,17 @@ socket.on("updateComments",(comments)=>{
   const box = document.getElementById("commentsList");
   box.innerHTML="";
   comments.forEach(c=>{
-    box.innerHTML+=`
-      <div class="comment-item">
-        <strong>${c.username}</strong> (${c.island})<br>
-        ${c.comment}
-      </div>`;
+    box.innerHTML+=`<div class="comment-item"><strong>${c.username}</strong> (${c.island})<br>${c.comment}</div>`;
   });
 });
 
-// Copy Dodo code
-document.getElementById("copyBtn").onclick=()=>{
-  const code=document.getElementById("code").innerText.replace("Dodo Code: ","");
-  if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
-};
-
-// Leave island
-document.getElementById("leaveBtn").onclick=()=>{
-  socket.emit("leaveIsland",userId);
-  localStorage.removeItem("queueUserId");
-  location.reload();
-};
-
-// Turnip Prices
+// --- Turnip Prices ---
 const turnipPriceEl = document.getElementById("turnipPrice");
 const updateBtn = document.getElementById("updateTurnipBtn");
-
-socket.on("turnipPriceUpdate",(price)=>{
-  turnipPriceEl.innerText = `Today's price: ${price} Bells`;
-});
-
-// Admin update
+socket.on("turnipPriceUpdate",(price)=>{ turnipPriceEl.innerText = `Today's price: ${price} Bells`; });
 updateBtn.onclick = ()=>{
   const price = prompt("Enter today's turnip price:");
-  if(!price) return;
-  socket.emit("updateTurnipPrice",price,"admin123"); // admin password
+  if(price) socket.emit("updateTurnipPrice",price,"admin123");
 };
 </script>
 </body>

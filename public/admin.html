@@ -2,184 +2,133 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Panel 🌴</title>
+<title>🌴 Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
-body {
-  font-family:'Linotte',sans-serif;
-  text-align:center;
-  background:#f0f8ff;
-  padding:30px;
-}
-
-.card{
-  background: rgba(255,255,255,0.95);
-  width:90%;
-  max-width:800px;
-  margin:30px auto;
-  padding:25px;
-  border-radius:25px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
-}
-
-input, button {
-  padding:10px; margin:8px; border-radius:10px; width:80%;
-  font-weight:bold;
-}
-
-button{
-  cursor:pointer; background:#ffb6b9; border:none; transition:0.2s;
-}
+body{font-family:'Linotte',sans-serif;text-align:center;background:#f0f8ff;padding:30px;}
+.card{background: rgba(255,255,255,0.9); width:90%; max-width:800px; margin:30px auto; padding:25px; border-radius:25px; box-shadow:0 10px 25px rgba(0,0,0,0.2);}
+input, button{padding:10px;margin:8px;border-radius:10px;width:80%;}
+button{cursor:pointer;font-weight:bold;background:#ffb6b9;border:none;transition:0.2s;}
 button:hover{background:#ff8b94;}
-
-table{
-  margin:auto;
-  width:95%;
-  border-collapse:collapse;
-}
+table{margin:auto;width:95%;border-collapse:collapse;}
 th,td{border:1px solid #ccc;padding:8px;text-align:center;}
 thead{background:#ffd700;}
-
-.toast{
-  position:fixed;
-  top:20px; right:20px;
-  background:#4CAF50; color:#fff;
-  padding:12px 20px; border-radius:10px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.3);
-  z-index:10000;
-  animation:fadeinout 3s forwards;
-}
-@keyframes fadeinout{
-  0%{opacity:0; transform:translateY(-20px);}
-  10%{opacity:1; transform:translateY(0);}
-  90%{opacity:1;}
-  100%{opacity:0; transform:translateY(-20px);}
-}
+.toast{position:fixed;top:20px;right:20px;background:#4CAF50;color:#fff;padding:12px 20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,0.3); z-index:10000; animation:fadeinout 3s forwards;}
+@keyframes fadeinout{0%{opacity:0; transform:translateY(-20px);}10%{opacity:1; transform:translateY(0);}90%{opacity:1;}100%{opacity:0; transform:translateY(-20px);}}
 </style>
 </head>
 <body>
 
 <div class="card">
-  <h2>🌴 Control Panel</h2>
+<h2>🌴 Control Panel</h2>
 
-  <!-- Current Values Preview -->
-  <div style="text-align:left; margin-bottom:15px; padding:10px; background:#fff3cd; border-radius:12px;">
-    <p><strong>Current Dodo Code:</strong> <span id="currentDodo">ABCD</span></p>
-    <p><strong>Current Island Password:</strong> <span id="currentPassword">daijoubu</span></p>
-    <p><strong>Current Turnip Price:</strong> <span id="currentTurnip">100 Bells</span></p>
-  </div>
+<!-- Dodo & Password Management -->
+<input id="dodoInput" placeholder="Enter new Dodo Code"><br>
+<input id="dodoPassword" type="password" placeholder="Admin Password"><br>
+<button onclick="updateDodo()">Update Dodo Code</button><br><br>
 
-  <!-- Inputs -->
-  <input id="dodoInput" placeholder="Enter new Dodo Code">
-  <button onclick="updateDodo()">Update Dodo Code</button><br>
+<input id="islandPasswordInput" placeholder="Set Island Password"><br>
+<input id="islandAdminPassword" type="password" placeholder="Admin Password"><br>
+<button onclick="updateIslandPassword()">Update Island Password</button><br><br>
 
-  <input id="islandPasswordInput" placeholder="Set Island Password">
-  <button onclick="updateIslandPassword()">Update Island Password</button><br>
+<input id="turnipPriceInput" placeholder="Set Turnip Price"><br>
+<input id="turnipAdminPassword" type="password" placeholder="Admin Password"><br>
+<button onclick="updateTurnipPrice()">Update Turnip Price</button><br><br>
 
-  <button onclick="updateTurnip()">Update Turnip Price</button>
-
-  <!-- Live Visitor Status -->
-  <h3>Visitor Status</h3>
-  <p>Currently on Island: <span id="visitorCount">0</span>/7</p>
-  <table>
-    <thead>
-      <tr>
-        <th>Player Name</th>
-        <th>Island Name</th>
-        <th>Password</th>
-        <th>Position</th>
-        <th>Status</th>
-        <th>Joined At</th>
-        <th>Time on Island</th>
-      </tr>
-    </thead>
-    <tbody id="visitorTable"></tbody>
-  </table>
+<h3>Live Visitor Status</h3>
+<p>Currently on Island: <span id="visitorCount">0</span>/7</p>
+<table>
+<thead>
+<tr>
+<th>Player Name</th>
+<th>Island Name</th>
+<th>Password</th>
+<th>Position</th>
+<th>Status</th>
+<th>Joined At</th>
+<th>Time on Island</th>
+</tr>
+</thead>
+<tbody id="visitorTable"></tbody>
+</table>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
-const ADMIN_PASSWORD = "admin123"; // set your password here
-let joinTimes = {};
 let visitorData = [];
+let joinTimes = {};
 
-// Toast helper
+// Toast
 function showToast(msg){
   const toast = document.createElement("div");
-  toast.className="toast"; toast.innerText=msg;
+  toast.className="toast"; toast.innerText = msg;
   document.body.appendChild(toast);
   setTimeout(()=>toast.remove(),3000);
 }
 
-// ----- Confirmation & Updates -----
+// Update Dodo
 function updateDodo(){
   const code = document.getElementById("dodoInput").value.trim();
-  if(!code) return alert("Please enter a Dodo code!");
-  if(confirm(`Update Dodo code to "${code}"?`)){
-    socket.emit("updateDodoCode", code, ADMIN_PASSWORD);
-    document.getElementById("currentDodo").innerText = code;
-    showToast("✅ Dodo code updated!");
-  }
+  const pass = document.getElementById("dodoPassword").value.trim();
+  if(!code || !pass) return alert("Fill Dodo code and password!");
+  socket.emit("updateDodoCode",code,pass);
+  showToast("✅ Dodo code updated!");
 }
 
+// Update Island Password
 function updateIslandPassword(){
-  const pass = document.getElementById("islandPasswordInput").value.trim();
-  if(!pass) return alert("Please enter a password!");
-  if(confirm(`Update Island password to "${pass}"?`)){
-    socket.emit("updateIslandPassword", pass, ADMIN_PASSWORD);
-    document.getElementById("currentPassword").innerText = pass;
-    showToast("✅ Island password updated!");
-  }
+  const newPass = document.getElementById("islandPasswordInput").value.trim();
+  const pass = document.getElementById("islandAdminPassword").value.trim();
+  if(!newPass || !pass) return alert("Fill Island password and admin password!");
+  socket.emit("updateIslandPassword",newPass,pass);
+  showToast("✅ Island password updated!");
 }
 
-function updateTurnip(){
-  const price = prompt("Enter today's turnip price:");
-  if(!price) return;
-  if(confirm(`Set turnip price to ${price} Bells?`)){
-    socket.emit("updateTurnipPrice", price, ADMIN_PASSWORD);
-    document.getElementById("currentTurnip").innerText = price + " Bells";
-    showToast("✅ Turnip price updated!");
-  }
+// Update Turnip Price
+function updateTurnipPrice(){
+  const price = document.getElementById("turnipPriceInput").value.trim();
+  const pass = document.getElementById("turnipAdminPassword").value.trim();
+  if(!price || !pass) return alert("Fill Turnip price and admin password!");
+  socket.emit("updateTurnipPrice",price,pass);
+  showToast("✅ Turnip price updated!");
 }
 
-// ----- Visitor Table -----
+// Render Table
 function renderTable(){
   const tbody = document.getElementById("visitorTable");
-  tbody.innerHTML="";
+  tbody.innerHTML = "";
   visitorData.forEach(u=>{
     const joinedAt = joinTimes[u.userId] || new Date();
-    if(!joinTimes[u.userId]) joinTimes[u.userId] = joinedAt;
-    let timeOnIsland="-";
+    joinTimes[u.userId] = joinedAt;
+    let timeOnIsland = "-";
     if(u.active){
       const diffMs = new Date() - joinedAt;
-      const mins = Math.floor(diffMs/60000);
-      const secs = Math.floor((diffMs%60000)/1000);
-      timeOnIsland = `${mins}m ${secs}s`;
+      const diffMins = Math.floor(diffMs/60000);
+      const diffSecs = Math.floor((diffMs%60000)/1000);
+      timeOnIsland = `${diffMins}m ${diffSecs}s`;
     }
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${u.username}</td>
-      <td>${u.visitorIsland}</td>
-      <td>${u.visitorPassword}</td>
-      <td>${u.position}</td>
-      <td>${u.active ? "On Island" : "Waiting"}</td>
-      <td>${joinedAt.toLocaleString()}</td>
-      <td>${timeOnIsland}</td>`;
+    tr.innerHTML = `<td>${u.username}</td>
+                    <td>${u.visitorIsland}</td>
+                    <td>${u.visitorPassword}</td>
+                    <td>${u.position}</td>
+                    <td>${u.active?'On Island':'Waiting'}</td>
+                    <td>${joinedAt.toLocaleString()}</td>
+                    <td>${timeOnIsland}</td>`;
     tbody.appendChild(tr);
   });
   document.getElementById("visitorCount").innerText = visitorData.filter(v=>v.active).length;
 }
 
-// Socket listeners
-socket.on("queueUpdate", data=>{
+// Listen for queue updates
+socket.on("queueUpdate",data=>{
   visitorData = data.users;
   renderTable();
 });
 
-socket.on("turnipPriceUpdate", price=>{
-  document.getElementById("currentTurnip").innerText = price + " Bells";
-});
+// Update table every second for timer
+setInterval(()=>{ renderTable(); },1000);
 </script>
 </body>
 </html>
