@@ -2,174 +2,117 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>🪻Private Island Admin Panel🪻</title>
+<title>🫧Private Island Queue🫧</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
 *{font-family:'Linotte',sans-serif;margin:0;padding:0;box-sizing:border-box;}
-body{background:#f0f8ff;padding:20px;text-align:center;}
-.card{background:#fff;width:95%;max-width:1000px;margin:20px auto;padding:25px;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.2);}
-input,button{padding:10px;margin:5px;border-radius:8px;width:80%;}
-button{cursor:pointer;font-weight:bold;background:#ffb6b9;border:none;}
+body{background:url('bg.jpg') no-repeat center center fixed;background-size:cover;text-align:center;}
+
+.card{
+background:rgba(255,255,255,0.92);
+width:360px;
+margin:20px auto;
+padding:25px;
+border-radius:25px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+input{padding:10px;margin:8px 0;border-radius:10px;border:1px solid #ccc;width:85%;}
+button{background:#ffb6b9;border:none;padding:10px 18px;border-radius:12px;cursor:pointer;}
 button:hover{background:#ff8b94;}
-table{margin:auto;width:100%;border-collapse:collapse;}
-th,td{border:1px solid #ccc;padding:8px;text-align:center;}
-thead{background:#ffd700;}
-.toast{position:fixed;top:20px;right:20px;background:#4CAF50;color:#fff;padding:12px 20px;border-radius:10px;z-index:10000;}
+
+.progress-container{background:#ddd;border-radius:20px;height:20px;overflow:hidden;margin-top:10px;}
+.progress-bar{height:100%;width:0%;background:green;transition:0.3s;}
+
+footer{
+width:100%;
+background:#ffd700;
+padding:12px 0;
+display:flex;
+justify-content:center;
+gap:20px;
+position:fixed;
+bottom:0;
+}
+footer img{width:24px;height:24px;}
 </style>
 </head>
 <body>
 
-<div class="card" id="loginCard">
-<h2>🔐 Admin Login</h2>
-<input id="adminPassword" type="password" placeholder="Enter Admin Password"><br>
-<button onclick="loginAdmin()">Login</button>
+<h1>🫧Private Island Queue🫧</h1>
+
+<div class="card" id="login">
+<h2>Join Island Queue</h2>
+<input id="username" placeholder="Player Name"><br>
+<input id="visitorIsland" placeholder="Island Name"><br>
+<input id="visitorPassword" placeholder="Island Pass" type="password"><br>
+<button onclick="login()">Join</button>
+<p id="visitorCountDisplay">Visitors: 0/7</p>
 </div>
 
-<div class="card" id="controlPanel" style="display:none;">
-
-<h2>🌴 Island Control Panel</h2>
-
-<!-- CURRENT STATUS -->
-<h3>Current Island Info</h3>
-<p>Dodo Code: <span id="currentDodo">Loading...</span></p>
-<p>Island Password: <span id="currentPass">Loading...</span></p>
-<p>Turnip Price: <span id="currentTurnip">Loading...</span></p>
-<p>Local Time: <span id="currentTime">Loading...</span></p>
-
-<hr>
-
-<!-- UPDATE SECTION -->
-<h3>Update Island Info</h3>
-<input id="dodoInput" placeholder="New Dodo Code"><br>
-<input id="islandPasswordInput" placeholder="New Island Password"><br>
-<input id="turnipInput" placeholder="New Turnip Price"><br>
-<input id="timeInput" placeholder="New Local Time"><br>
-<button onclick="updateAll()">Save Changes</button>
-
-<hr>
-
-<!-- VISITOR TABLE -->
-<h3>👥 Visitor Status</h3>
-<p>Currently On Island: <span id="visitorCount">0</span>/7</p>
-
-<table>
-<thead>
-<tr>
-<th>Player</th>
-<th>Island</th>
-<th>IP</th>
-<th>Position</th>
-<th>Status</th>
-<th>Joined</th>
-<th>Time on Island</th>
-</tr>
-</thead>
-<tbody id="visitorTable"></tbody>
-</table>
-
+<div class="card" id="queue" style="display:none;">
+<h2 id="status"></h2>
+<p id="position"></p>
+<div class="progress-container">
+<div id="progressBar" class="progress-bar"></div>
 </div>
+<p id="progressText">0/7 Visitors</p>
+<h3 id="code"></h3>
+<button onclick="leaveIsland()">Leave Island</button>
+</div>
+
+<footer>
+<a href="https://www.youtube.com/@daijoubuxix" target="_blank"><img src="youtube.png">YouTube</a>
+<a href="https://www.twitch.tv/daijoubuxix" target="_blank"><img src="twitch.png">Twitch</a>
+<a href="https://www.facebook.com/daijoubuacnh" target="_blank"><img src="facebook.png">Follow</a>
+</footer>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
-let adminAuthenticated = false;
-let visitorData = [];
+let userId = crypto.randomUUID();
 
-// ===== Toast =====
-function showToast(msg){
-const t=document.createElement("div");
-t.className="toast";
-t.innerText=msg;
-document.body.appendChild(t);
-setTimeout(()=>t.remove(),3000);
+function login(){
+const username=document.getElementById("username").value.trim();
+const visitorIsland=document.getElementById("visitorIsland").value.trim();
+const pass=document.getElementById("visitorPassword").value.trim();
+
+if(!username||!visitorIsland||!pass){
+alert("Fill all fields");
+return;
 }
 
-// ===== LOGIN =====
-function loginAdmin(){
-const password=document.getElementById("adminPassword").value.trim();
-if(!password) return alert("Enter password");
-
-socket.emit("adminLogin", password);
+socket.emit("joinQueue",{userId,username,visitorIsland});
+document.getElementById("login").style.display="none";
+document.getElementById("queue").style.display="block";
 }
 
-socket.on("adminLoginResult",(success)=>{
-if(success){
-adminAuthenticated=true;
-document.getElementById("loginCard").style.display="none";
-document.getElementById("controlPanel").style.display="block";
-showToast("✅ Logged in successfully");
-socket.emit("requestIslandStatus");
+function leaveIsland(){
+socket.emit("leaveQueue",userId);
+location.reload();
+}
+
+socket.on("queueUpdate",data=>{
+document.getElementById("visitorCountDisplay").innerText=
+"Visitors: "+data.activeCount+"/7";
+
+const user=data.users.find(u=>u.userId===userId);
+if(!user) return;
+
+document.getElementById("position").innerText="Position: "+user.position;
+
+const percent=(data.activeCount/7)*100;
+document.getElementById("progressBar").style.width=percent+"%";
+document.getElementById("progressText").innerText=data.activeCount+"/7 Visitors";
+
+if(user.active){
+document.getElementById("status").innerText="You're on the island!";
+document.getElementById("code").innerText="Dodo Code: "+user.dodoCodeDisplay;
 }else{
-alert("❌ Wrong password");
+document.getElementById("status").innerText="Waiting in queue...";
 }
 });
-
-// ===== UPDATE ISLAND INFO =====
-function updateAll(){
-if(!adminAuthenticated) return alert("Login first");
-
-const data={
-dodo:document.getElementById("dodoInput").value.trim(),
-pass:document.getElementById("islandPasswordInput").value.trim(),
-turnip:document.getElementById("turnipInput").value.trim(),
-time:document.getElementById("timeInput").value.trim()
-};
-
-socket.emit("adminUpdateIsland",data);
-showToast("✅ Update sent!");
-}
-
-// ===== RECEIVE ISLAND STATUS =====
-socket.on("islandStatusUpdate",data=>{
-document.getElementById("currentDodo").innerText=data.dodoCode;
-document.getElementById("currentPass").innerText=data.islandPass;
-document.getElementById("currentTurnip").innerText=data.turnipPrice;
-document.getElementById("currentTime").innerText=data.localTime;
-});
-
-// ===== VISITOR TABLE =====
-socket.on("queueUpdate",(data)=>{
-visitorData=data.users;
-renderTable();
-});
-
-function renderTable(){
-const tbody=document.getElementById("visitorTable");
-tbody.innerHTML="";
-
-visitorData.forEach(u=>{
-const joined=new Date(u.joinedAt);
-let timeOnIsland="-";
-
-if(u.active){
-const diff=new Date()-joined;
-const mins=Math.floor(diff/60000);
-const secs=Math.floor((diff%60000)/1000);
-timeOnIsland=mins+"m "+secs+"s";
-}
-
-const tr=document.createElement("tr");
-tr.innerHTML=`
-<td>${u.username}</td>
-<td>${u.visitorIsland}</td>
-<td>${u.ip}</td>
-<td>${u.position}</td>
-<td>${u.active?"On Island":"Waiting"}</td>
-<td>${joined.toLocaleString()}</td>
-<td>${timeOnIsland}</td>
-`;
-tbody.appendChild(tr);
-});
-
-document.getElementById("visitorCount").innerText=
-visitorData.filter(v=>v.active).length;
-}
-
-// Update time every second
-setInterval(()=>{
-if(visitorData.length>0) renderTable();
-},1000);
-
 </script>
+
 </body>
 </html>
