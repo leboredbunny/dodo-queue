@@ -2,174 +2,247 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>🪻Daijoubu's Island Queue 🌴</title>
+<title>🪻Daijoubu's Private Island Queue🪻</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
-body {font-family:'Linotte',sans-serif;margin:0;padding:0;text-align:center;background:url('bg.jpg') no-repeat center center fixed;background-size:cover;}
-.card{background: rgba(255,255,255,0.85);width:360px;margin:60px auto;padding:30px;border-radius:25px;box-shadow:0 10px 25px rgba(0,0,0,0.2);}
-input{padding:10px;margin:8px 0;border-radius:10px;border:1px solid #ccc;width:80%;box-sizing:border-box;}
-button{background:#ffb6b9;border:none;padding:12px 22px;border-radius:12px;cursor:pointer;font-weight:bold;margin-top:10px;transition:0.2s;}
+body {
+  font-family: 'Linotte', sans-serif;
+  margin:0; padding:0;
+  text-align:center;
+  background:url('bg.jpg') no-repeat center center fixed;
+  background-size:cover;
+}
+.card{
+  background: rgba(255,255,255,0.85);
+  width:360px;
+  margin:80px auto 120px;
+  padding:30px;
+  border-radius:25px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+input{
+  padding:10px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+  width:80%;
+  box-sizing:border-box;
+}
+button{
+  background:#ffb6b9;
+  border:none;
+  padding:12px 22px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:10px;
+  transition:0.2s;
+}
 button:hover{background:#ff8b94;}
-@media(max-width:500px){.card{width:90%;margin:40px auto;padding:20px;}}
+@media(max-width:500px){.card{width:90%; margin:40px auto; padding:20px;}}
 
-#rulesModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background: rgba(0,0,0,0.7);z-index:9999;text-align:center;}
-#rulesModal div{background:#fff;padding:30px;border-radius:20px;margin:100px auto;width:90%;max-width:400px;box-shadow:0 10px 20px rgba(0,0,0,0.3);cursor:move;}
-#rulesModal button{border:none;padding:12px 20px;border-radius:12px;background:#ffb6b9;cursor:pointer;font-weight:bold;transition:0.2s;}
-#rulesModal button:hover{ background:#ff8b94; }
-#rulesModal a { color:#ff8b94; font-weight:bold; text-decoration:none; }
-#rulesModal a:hover { text-decoration:underline; }
+header{
+  width:100%;
+  padding:15px;
+  background: rgba(255,255,255,0.85);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+header h1{margin:0;}
+header button{
+  border:none; background:#ffd700; padding:8px 14px;
+  border-radius:10px; font-weight:bold; cursor:pointer;
+}
+header button:hover{background:#ffcc00;}
 
-a button{padding:10px 16px;background:#ffd700;color:#000;border:none;border-radius:12px;font-weight:bold;cursor:pointer;transition:0.2s;display:flex;align-items:center;}
-a button:hover{ background:#ffcc00; }
-a img{display:block;margin-right:5px;}
+#rulesModal, #aboutModal{
+  display:none;
+  position:fixed; top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.7);
+  z-index:9999;
+  text-align:center;
+}
+#rulesModal div, #aboutModal div{
+  background:#fff; padding:30px; border-radius:20px;
+  margin:100px auto;
+  width:90%; max-width:400px;
+  box-shadow:0 10px 20px rgba(0,0,0,0.3);
+  cursor:move; position:relative;
+}
+#rulesModal button, #aboutModal button{
+  border:none; padding:12px 20px;
+  border-radius:12px; background:#ffb6b9;
+  cursor:pointer; font-weight:bold; transition:0.2s;
+}
+#rulesModal button:hover, #aboutModal button:hover{background:#ff8b94;}
+#rulesModal a, #aboutModal a{color:#ff8b94; font-weight:bold; text-decoration:none;}
+#rulesModal a:hover, #aboutModal a:hover{text-decoration:underline;}
 
-.toast{position:fixed;top:20px;right:20px;background:#4CAF50;color:#fff;padding:12px 20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,0.3);z-index:10000;animation:fadeinout 3s forwards;}
-@keyframes fadeinout{0%{opacity:0; transform:translateY(-20px);}10%{opacity:1; transform:translateY(0);}90%{opacity:1;}100%{opacity:0; transform:translateY(-20px);}}
+footer{
+  width:100%; background:#ffd700; padding:12px 0;
+  display:flex; justify-content:center; gap:20px;
+  box-shadow:0 -4px 10px rgba(0,0,0,0.2);
+  position:fixed; bottom:0;
+}
+footer a{
+  display:flex; align-items:center; gap:8px;
+  text-decoration:none; font-weight:bold;
+  color:#000; background:#fff; padding:8px 12px; border-radius:12px;
+  transition:0.2s;
+}
+footer a:hover{background:#ffeb99;}
+footer img{width:24px; height:24px;}
+
+.toast{
+  position:fixed; top:20px; right:20px;
+  background:#4CAF50; color:#fff; padding:12px 20px;
+  border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3);
+  z-index:10000; animation:fadeinout 3s forwards;
+}
+@keyframes fadeinout{
+0%{opacity:0; transform:translateY(-20px);}
+10%{opacity:1; transform:translateY(0);}
+90%{opacity:1;}
+100%{opacity:0; transform:translateY(-20px);}
+}
 </style>
 </head>
 <body>
 
-<!-- Rules Modal -->
+<header>
+  <h1>🌴 My Island Queue</h1>
+  <button onclick="openAbout()">ℹ️ About / Island Maps</button>
+</header>
+
 <div id="rulesModal">
-    <div>
-        <h2>🌴 Welcome to My Private Island</h2>
-        <ul style="text-align:left; margin:15px 0;">
-            <li>Grab anything you need!</li>
-            <li>Leave via AIRPORT Only</li>
-            <li>Follow the queue order</li>
-            <li>Click Leave Island once you leave my island!</li>
-            <li>Check out my <a href="https://discord.gg/YOUR_DISCORD_LINK" target="_blank">💬 Discord</a> if you want to join my community</li>
-            <li>For Private Treasure Islands check me on <a href="https://ko-fi.com/YOUR_KOFI_USERNAME" target="_blank">☕ Ko-fi</a>!</li>
-        </ul>
-        <button onclick="closeRules()">I Understand</button>
-    </div>
+  <div>
+    <h2>🌴 Welcome to My Private Island</h2>
+    <ul style="text-align:left; margin:15px 0;">
+      <li>Be polite to other visitors</li>
+      <li>Do not pick flowers or shake trees</li>
+      <li>Follow the queue order</li>
+      <li>Enjoy exploring the island!</li>
+      <li>Check out our <a href="https://discord.gg/YXfmSWuKQT" target="_blank">💬 Discord</a></li>
+      <li>Support us on <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank">☕ Ko-fi</a></li>
+    </ul>
+    <button onclick="closeRules()">I Understand</button>
+  </div>
 </div>
 
-<!-- Login Card -->
 <div class="card" id="login">
-    <h2>🪻Daijoubu's Island Queue 🌴</h2>
-    <input id="username" placeholder="Player Name"><br>
-    <input id="visitorIsland" placeholder="Island Name"><br>
-    <input id="visitorPassword" placeholder="Your Password" type="password"><br>
-    <button onclick="login()">Join Island Queue</button>
-
-    <div style="margin-top:15px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-        <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank">
-            <button style="display:flex; align-items:center; gap:8px;"><img src="kofi-logo.png" width="24" height="24">☕ Private Treasure Islands</button>
-        </a>
-        <a href="https://discord.gg/YXfmSWuKQT" target="_blank">
-            <button style="display:flex; align-items:center; gap:8px;"><img src="discord-logo.png" width="24" height="24">💬 Join my Community</button>
-        </a>
-    </div>
+  <h2>🌴 Island Queue</h2>
+  <input id="username" placeholder="Player Name"><br>
+  <input id="visitorIsland" placeholder="Island Name"><br>
+  <input id="visitorPassword" placeholder="Your Password" type="password"><br>
+  <button onclick="login()">Join Island Queue</button>
+  <p style="margin-top:15px;" id="visitorCountDisplay">Visitors on island: 0/7</p>
 </div>
 
-<!-- Queue Card -->
 <div class="card" id="queue" style="display:none;">
-    <h2 id="status"></h2>
-    <p id="position"></p>
-    <p id="waitTime"></p>
-    <p id="islandCount"></p>
-    <h3 id="code"></h3>
-    <button id="copyBtn">📋 Copy Dodo Code</button><br>
-    <button id="leaveBtn">Leave Island</button>
+  <h2 id="status"></h2>
+  <p id="position"></p>
+  <p id="waitTime"></p>
+  <p id="islandCount"></p>
+  <h3 id="code"></h3>
+  <button id="copyBtn">📋 Copy Dodo Code</button><br>
+  <button id="leaveBtn">Leave Island</button>
 </div>
+
+<!-- NEW TREASURE MAPS SECTION -->
+<div class="card" id="mapsSection" style="display:none;">
+  <h2>🗺️ Treasure Island Maps</h2>
+  <p>
+    <a id="mapsLink" href="#" target="_blank" 
+    style="font-weight:bold; color:#ff8b94;">
+      🌴 View My Treasure Island Maps
+    </a>
+  </p>
+</div>
+
+<footer>
+  <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank">
+    <img src="kofi-logo.png">☕ Private Treasure Islands
+  </a>
+  <a href="https://discord.gg/YXfmSWuKQT" target="_blank">
+    <img src="discord-logo.png">💬 Join my Community
+  </a>
+</footer>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
 let userId;
-let countdownInterval;
 
-// Show rules modal once and make draggable
+const imgurLink = "https://imgur.com/a/maps-BVMEz0p";
+
+if(imgurLink){
+  document.getElementById("mapsLink").href = imgurLink;
+}
+
 window.onload = () => {
-    if(!localStorage.getItem("rulesSeen")){
-        const modal = document.getElementById("rulesModal");
-        modal.style.display="block";
-        makeDraggable(modal.querySelector("div"));
-    }
+  if(!localStorage.getItem("rulesSeen")){
+    document.getElementById("rulesModal").style.display="block";
+  }
 };
 
-// Rules modal
+function openAbout(){document.getElementById("aboutModal").style.display="block";}
 function closeRules(){
-    document.getElementById("rulesModal").style.display="none";
-    localStorage.setItem("rulesSeen","true");
-}
-function makeDraggable(elmnt){
-    let pos1=0,pos2=0,pos3=0,pos4=0;
-    elmnt.onmousedown = dragMouseDown;
-    function dragMouseDown(e){
-        e = e || window.event; e.preventDefault();
-        pos3 = e.clientX; pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-    }
-    function elementDrag(e){
-        e=e||window.event;e.preventDefault();
-        pos1=pos3-e.clientX; pos2=pos4-e.clientY;
-        pos3=e.clientX; pos4=e.clientY;
-        elmnt.style.top=(elmnt.offsetTop-pos2)+"px";
-        elmnt.style.left=(elmnt.offsetLeft-pos1)+"px";
-        elmnt.style.position="absolute";
-    }
-    function closeDragElement(){document.onmouseup=null;document.onmousemove=null;}
+  document.getElementById("rulesModal").style.display="none";
+  localStorage.setItem("rulesSeen","true");
 }
 
-// Login
 function login(){
-    const username=document.getElementById("username").value.trim();
-    const visitorIsland=document.getElementById("visitorIsland").value.trim();
-    const visitorPassword=document.getElementById("visitorPassword").value.trim();
-    if(!username||!visitorIsland||!visitorPassword){alert("Please fill all fields");return;}
-    fetch("/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,visitorIsland,visitorPassword})})
-    .then(res=>res.json()).then(data=>{
-        if(data.success){
-            userId=crypto.randomUUID();
-            document.getElementById("login").style.display="none";
-            document.getElementById("queue").style.display="block";
-            socket.emit("joinQueue",{userId,username,visitorIsland,visitorPassword});
-        }else alert("Incorrect credentials! Make sure all fields are correct.");
-    });
+  const username = document.getElementById("username").value.trim();
+  const visitorIsland = document.getElementById("visitorIsland").value.trim();
+  const visitorPassword = document.getElementById("visitorPassword").value.trim();
+  if(!username || !visitorIsland || !visitorPassword){
+    alert("Fill all fields"); return;
+  }
+  fetch("/login",{method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({username,visitorIsland,visitorPassword})})
+  .then(res=>res.json()).then(data=>{
+    if(data.success){
+      userId = crypto.randomUUID();
+      document.getElementById("login").style.display="none";
+      document.getElementById("queue").style.display="block";
+      document.getElementById("mapsSection").style.display="block";
+      socket.emit("joinQueue",{userId,username,visitorIsland,visitorPassword});
+    } else alert("Incorrect credentials");
+  });
 }
 
-// Queue updates
 socket.on("queueUpdate",(data)=>{
-    const user=data.users.find(u=>u.userId===userId);
-    if(!user) return;
-    document.getElementById("position").innerText="Position: "+user.position;
-    document.getElementById("islandCount").innerText="Island: "+data.activeCount+"/7 visitors";
-    if(countdownInterval) clearInterval(countdownInterval);
-    if(user.active){
-        document.getElementById("status").innerText="🎉 You're on the island!";
-        document.getElementById("code").innerText="Dodo Code: "+data.dodoCode;
-        document.getElementById("waitTime").innerText="";
-    } else {
-        document.getElementById("status").innerText="🌼 Waiting in queue...";
-        document.getElementById("code").innerText="";
-        let waitSeconds=Math.max(0,(user.position-7)*5*60);
-        countdownInterval=setInterval(()=>{
-            let minutes=Math.floor(waitSeconds/60);
-            let seconds=waitSeconds%60;
-            document.getElementById("waitTime").innerText=`Estimated wait: ${minutes}m ${seconds}s`;
-            if(waitSeconds<=0){clearInterval(countdownInterval);document.getElementById("waitTime").innerText="You are next!";}
-            waitSeconds--;
-        },1000);
-    }
+  const user = data.users.find(u=>u.userId===userId);
+  if(!user) return;
+
+  document.getElementById("position").innerText="Position: "+user.position;
+  document.getElementById("islandCount").innerText="Island: "+data.activeCount+"/7 visitors";
+
+  if(user.active){
+    document.getElementById("status").innerText="🎉 You're on the island!";
+    document.getElementById("code").innerText="Dodo Code: "+data.dodoCode;
+    document.getElementById("waitTime").innerText="";
+  } else {
+    document.getElementById("status").innerText="🌼 Waiting in queue...";
+    document.getElementById("code").innerText="";
+  }
+
+  document.getElementById("visitorCountDisplay").innerText=
+  "Visitors on island: "+data.activeCount+"/7";
 });
 
-// Toast notifications
-socket.on("toastUpdate",(msg)=>{
-    const toast=document.createElement("div");
-    toast.className="toast"; toast.innerText=msg;
-    document.body.appendChild(toast);
-    setTimeout(()=>toast.remove(),3000);
-});
-
-// Buttons
-document.getElementById("copyBtn").onclick=()=>{
-    const code=document.getElementById("code").innerText.replace("Dodo Code: ","");
-    if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
+document.getElementById("copyBtn").onclick = ()=>{
+  const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
+  if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
 };
-document.getElementById("leaveBtn").onclick=()=>{socket.emit("leaveIsland",userId);};
+
+document.getElementById("leaveBtn").onclick = ()=>{
+  socket.emit("leaveIsland",userId);
+};
 </script>
 </body>
 </html>
