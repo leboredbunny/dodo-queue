@@ -206,18 +206,17 @@ function login(){
   const visitorIsland = document.getElementById("visitorIsland").value.trim();
   const visitorPassword = document.getElementById("visitorPassword").value.trim();
   if(!username||!visitorIsland||!visitorPassword){alert("Fill all fields"); return;}
-  
-  fetch("/login",{method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({username,visitorIsland,password:visitorPassword})})
-  .then(res=>res.json())
-  .then(data=>{
-    if(data.success){
-      userId = crypto.randomUUID();
-      localStorage.setItem("queueUserId",userId);
-      showQueueUI();
-      socket.emit("joinQueue",{userId,username,visitorIsland});
-    } else alert(data.msg || "Login failed");
+
+  userId = crypto.randomUUID();
+  localStorage.setItem("queueUserId",userId);
+  showQueueUI();
+
+  socket.emit("joinQueue", {
+    userId,
+    username,
+    visitorIsland,
+    visitorPassword,
+    joinTime: new Date()
   });
 }
 
