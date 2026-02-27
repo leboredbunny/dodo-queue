@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Island Queue 🌴</title>
+<title>🪻Daijoubu's Private Island Queue 🏝</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
 body {
@@ -29,9 +29,12 @@ button:hover{background:#ff8b94;}
 #rulesModal div {
     background:#fff; padding:30px; border-radius:20px;
     margin:100px auto; width:90%; max-width:400px; box-shadow:0 10px 20px rgba(0,0,0,0.3);
+    cursor: move;
 }
 #rulesModal button{border:none; padding:12px 20px; border-radius:12px; background:#ffb6b9; cursor:pointer; font-weight:bold; transition:0.2s;}
 #rulesModal button:hover{ background:#ff8b94; }
+#rulesModal a { color:#ff8b94; font-weight:bold; text-decoration:none; }
+#rulesModal a:hover { text-decoration:underline; }
 
 /* Social buttons */
 a button {
@@ -39,7 +42,20 @@ a button {
     font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center;
 }
 a button:hover { background:#ffcc00; }
-a img { display:block; }
+a img { display:block; margin-right:5px; }
+
+/* Toast messages */
+.toast{
+    position:fixed; top:20px; right:20px; background:#4CAF50; color:#fff;
+    padding:12px 20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); z-index:10000;
+    animation:fadeinout 3s forwards;
+}
+@keyframes fadeinout{
+    0%{opacity:0; transform:translateY(-20px);}
+    10%{opacity:1; transform:translateY(0);}
+    90%{opacity:1;}
+    100%{opacity:0; transform:translateY(-20px);}
+}
 </style>
 </head>
 <body>
@@ -47,14 +63,16 @@ a img { display:block; }
 <!-- Rules Modal -->
 <div id="rulesModal">
     <div>
-        <h2>🌴 Island Rules</h2>
+        <h2>🌴 Welcome to My Private Island</h2>
         <ul style="text-align:left; margin:15px 0;">
-            <li>Be polite to visitors</li>
-            <li>No stealing flowers or fruit</li>
-            <li>Follow the queue system</li>
-            <li>Have fun exploring!</li>
+            <li>Grab anything you need!</li>
+            <li>Leave via AIRPORT Only</li>
+            <li>Follow the queue order</li>
+            <li>Click Leave Island once you leave my island!</li>
+            <li>Check out my <a href="https://discord.gg/YOUR_DISCORD_LINK" target="_blank">💬 Discord</a> if you want to join my community</li>
+            <li>For Private Treasure Islands check me on <a href="https://ko-fi.com/YOUR_KOFI_USERNAME" target="_blank">☕ Ko-fi</a>!</li>
         </ul>
-        <button onclick="closeRules()">Got it!</button>
+        <button onclick="closeRules()">I Understand</button>
     </div>
 </div>
 
@@ -100,15 +118,43 @@ const socket = io();
 let userId;
 let countdownInterval;
 
-// Show rules modal once per visitor
+// Show rules modal once per visitor and make it draggable
 window.onload = () => {
     if(!localStorage.getItem("rulesSeen")) {
-        document.getElementById("rulesModal").style.display = "block";
+        const modal = document.getElementById("rulesModal");
+        modal.style.display = "block";
+        makeDraggable(modal.querySelector("div"));
     }
 };
+
+// Close rules modal
 function closeRules() {
     document.getElementById("rulesModal").style.display = "none";
     localStorage.setItem("rulesSeen", "true");
+}
+
+// Draggable function
+function makeDraggable(elmnt) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    elmnt.onmousedown = dragMouseDown;
+    function dragMouseDown(e) {
+        e = e || window.event; e.preventDefault();
+        pos3 = e.clientX; pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+    function elementDrag(e) {
+        e = e || window.event; e.preventDefault();
+        pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+        pos3 = e.clientX; pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        elmnt.style.position = "absolute";
+    }
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
 }
 
 // Login
@@ -116,12 +162,10 @@ function login() {
     const username = document.getElementById("username").value.trim();
     const visitorIsland = document.getElementById("visitorIsland").value.trim();
     const visitorPassword = document.getElementById("visitorPassword").value.trim();
-
     if(!username || !visitorIsland || !visitorPassword){
         alert("Please fill all fields");
         return;
     }
-
     fetch("/login",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -140,7 +184,7 @@ function login() {
     });
 }
 
-// Queue updates with live countdown
+// Queue updates
 socket.on("queueUpdate", (data) => {
     const user = data.users.find(u => u.userId === userId);
     document.getElementById("position").innerText = user ? "Position: " + user.position : "";
@@ -158,7 +202,6 @@ socket.on("queueUpdate", (data) => {
             document.getElementById("code").innerText = "";
 
             let waitSeconds = Math.max(0, (user.position - 7) * 5 * 60);
-
             countdownInterval = setInterval(() => {
                 let minutes = Math.floor(waitSeconds / 60);
                 let seconds = waitSeconds % 60;
@@ -173,6 +216,7 @@ socket.on("queueUpdate", (data) => {
     }
 });
 
+// Buttons
 document.getElementById("leaveBtn").onclick = ()=>{ socket.emit("leaveIsland",userId); };
 document.getElementById("copyBtn").onclick = ()=>{
     const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
