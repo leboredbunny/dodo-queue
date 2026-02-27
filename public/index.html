@@ -2,13 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>🪻Daijoubu's Private Island Queue🪻</title>
-
-<!-- Linotte Bold -->
+<title>🫧Private Island Queue🫧</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
-
 <style>
-*{font-family:'Linotte',sans-serif;font-weight:bold;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;margin:0;padding:0;box-sizing:border-box;}
+*{font-family:'Linotte',sans-serif;font-weight:bold;margin:0;padding:0;box-sizing:border-box;}
 
 body{
   background:url('bg.jpg') no-repeat center center fixed;
@@ -16,6 +13,7 @@ body{
   text-align:center;
 }
 
+/* ===== HEADER ===== */
 header{
   width:100%;
   padding:15px;
@@ -26,12 +24,9 @@ header{
   box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
-header h1{margin:0;}
-header button{border:none;background:#ffd700;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:bold;}
-header button:hover{background:#ffcc00;}
-
+/* ===== CARDS ===== */
 .card{
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.92);
   width:360px;
   margin:20px auto;
   padding:25px;
@@ -39,34 +34,53 @@ header button:hover{background:#ffcc00;}
   box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
-input{padding:10px;margin:8px 0;border-radius:10px;border:1px solid #ccc;width:85%;}
+input{
+  padding:10px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+  width:85%;
+}
 
 button{
-  background:#ffb6b9;border:none;padding:10px 18px;border-radius:12px;cursor:pointer;
-  transition:0.2s;
+  background:#ffb6b9;
+  border:none;
+  padding:10px 18px;
+  border-radius:12px;
+  cursor:pointer;
 }
+
 button:hover{background:#ff8b94;}
 
-.progress-container{
-  background: #ddd;
-  border-radius: 20px;
-  height: 20px;
-  overflow: hidden;
-  margin-top: 10px;
+/* ===== STATUS WINDOW ===== */
+.status-box{
+  background:#fff3cd;
 }
+
+/* ===== PROGRESS ===== */
+.progress-container{
+  background:#ddd;
+  border-radius:20px;
+  height:20px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
 .progress-bar{
-  height: 100%;
-  width: 0%;
-  background: green;
+  height:100%;
+  width:0%;
+  background:green;
   transition:0.3s;
 }
 
+/* ===== GUESTBOOK ===== */
 .comment-box{
   text-align:left;
   max-height:200px;
   overflow-y:auto;
   margin-bottom:10px;
 }
+
 .comment-item{
   background:#f5f5f5;
   padding:8px;
@@ -74,21 +88,21 @@ button:hover{background:#ff8b94;}
   margin-bottom:8px;
 }
 
+/* ===== FOOTER ===== */
 footer{
-  width:100%; background:#ffd700; padding:12px 0;
-  display:flex; justify-content:center; gap:20px;
+  width:100%;
+  background:#ffd700;
+  padding:12px 0;
+  display:flex;
+  justify-content:center;
+  gap:20px;
   box-shadow:0 -4px 10px rgba(0,0,0,0.2);
-  position:fixed; bottom:0;
+  position:fixed;
+  bottom:0;
 }
-footer a{
-  display:flex; align-items:center; gap:8px;
-  text-decoration:none; color:#000; background:#fff; padding:8px 12px; border-radius:12px;
-  transition:0.2s;
-}
-footer a:hover{background:#ffeb99;}
+
 footer img{width:24px;height:24px;}
 
-/* Floating social icons */
 .floating-icons{
   position:fixed;
   top:50%;
@@ -96,186 +110,193 @@ footer img{width:24px;height:24px;}
   display:flex;
   flex-direction:column;
   gap:10px;
-  z-index:9999;
 }
+
 .floating-icons img{
   width:50px;
   height:50px;
   cursor:pointer;
-  transition:0.3s;
   opacity:0.7;
+  transition:0.3s;
 }
-.floating-icons img:hover{opacity:1; transform:scale(1.1);}
+
+.floating-icons img:hover{
+  opacity:1;
+  transform:scale(1.1);
+}
+
+/* Disable selecting Dodo */
+.no-copy{
+  user-select:none;
+}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🫧Private Island Queue🫧</h1>
-  <button onclick="openAbout()">ℹ️ Island Rules & Maps</button>
+<h1>🫧Private Island Queue🫧</h1>
+<button onclick="openAbout()">ℹ️ Island Rules</button>
 </header>
 
-<!-- Rules Modal -->
-<div id="rulesModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;text-align:center;">
-  <div style="background:#fff;padding:30px;border-radius:20px;margin:100px auto;width:90%;max-width:400px;">
-    <h2>🌴 Welcome to My Private Island</h2>
-    <ul style="text-align:left;margin:15px 0;">
-      <li>Grab anything you need!</li>
-      <li>Leave via AIRPORT Only</li>
-      <li>Follow the queue order</li>
-      <li>Click Leave Island once you leave!</li>
-      <li>Check my <a href="https://discord.gg/YXfmSWuKQT" target="_blank">💬 Discord</a></li>
-      <li>Private Treasure Islands on <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank">☕ Ko-fi</a></li>
-      <li>Treasure Maps: <a href="https://imgur.com/a/maps-BVMEz0p" target="_blank">🌴 View Maps</a></li>
-    </ul>
-    <button onclick="closeRules()">I Understand</button>
-  </div>
+<!-- STATUS WINDOW -->
+<div class="card status-box">
+<h2>🌴 Island Status</h2>
+<p>Island Pass: <span id="islandPassDisplay">Loading...</span></p>
+<p>Dodo Code: <span id="dodoDisplay" class="no-copy"></span></p>
+<p>Turnip Price: <span id="turnipDisplay"></span></p>
+<p>Local Time: <span id="timeDisplay"></span></p>
 </div>
 
-<!-- Login Card -->
+<!-- LOGIN -->
 <div class="card" id="login">
-  <h2>🫧Island Queue🫧</h2>
-  <input id="username" placeholder="Player Name"><br>
-  <input id="visitorIsland" placeholder="Island Name"><br>
-  <input id="visitorPassword" placeholder="Island Password" type="password"><br>
-  <button onclick="login()">Join Island Queue</button>
-  <p id="visitorCountDisplay">Visitors on island: 0/7</p>
+<h2>🫧Island Queue🫧</h2>
+<input id="username" placeholder="Player Name"><br>
+<input id="visitorIsland" placeholder="Island Name"><br>
+<input id="visitorPassword" placeholder="Island Password" type="password"><br>
+<button onclick="login()">Join Island Queue</button>
+<p id="visitorCountDisplay">Visitors on island: 0/7</p>
 </div>
 
-<!-- Queue Card -->
+<!-- QUEUE -->
 <div class="card" id="queue" style="display:none;">
-  <h2 id="status"></h2>
-  <p id="position"></p>
-  <div class="progress-container">
-    <div id="progressBar" class="progress-bar"></div>
-  </div>
-  <p id="progressText">0/7 Visitors</p>
-  <h3 id="code"></h3>
-  <button id="copyBtn">📋 Copy Dodo Code</button><br>
-  <button id="leaveBtn">Leave Island</button>
+<h2 id="status"></h2>
+<p id="position"></p>
+<div class="progress-container">
+<div id="progressBar" class="progress-bar"></div>
+</div>
+<p id="progressText">0/7 Visitors</p>
+<h3 id="code" class="no-copy"></h3>
+<button id="leaveBtn">Leave Island</button>
 </div>
 
-<!-- Guestbook -->
+<!-- GUESTBOOK -->
 <div class="card" id="guestbook" style="display:none;">
-  <h2>🌸 Visitor Guestbook</h2>
-  <div id="commentsList" class="comment-box"></div>
-  <input id="commentText" placeholder="Leave a comment..." style="width:80%;">
-  <button onclick="submitComment()">Post</button>
+<h2>🌸 Visitor Guestbook</h2>
+<div id="commentsList" class="comment-box"></div>
+<input id="commentText" placeholder="Leave a comment...">
+<button onclick="submitComment()">Post</button>
 </div>
 
-<!-- Turnip Price -->
+<!-- TURNIP CARD -->
 <div class="card" id="turnipCard" style="display:none;">
-  <h2>💰 Turnip Prices</h2>
-  <img id="turnipLogo" src="turnip.png" alt="Turnip Logo" style="width:60px;height:60px;"><br>
-  <p id="turnipPrice">Loading price...</p>
+<h2>💰 Turnip Prices</h2>
+<img src="turnip.png" style="width:60px;">
+<p id="turnipPrice">Loading...</p>
 </div>
 
-<!-- Footer links -->
+<!-- FOOTER -->
 <footer>
-  <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank"><img src="kofi-logo.png">☕ Ko-fi</a>
-  <a href="https://discord.gg/YXfmSWuKQT" target="_blank"><img src="discord-logo.png">💬 Discord</a>
-  <a href="https://www.youtube.com/@daijoubuxix" target="_blank"><img src="youtube.png">YouTube</a>
-  <a href="https://www.twitch.tv/YOUR_CHANNEL" target="_blank"><img src="twitch.png">Twitch</a>
-  <a href="https://www.facebook.com/daijoubuacnh" target="_blank"><img src="facebook.png">Follow Me</a>
+<a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank"><img src="kofi-logo.png">Ko-fi</a>
+<a href="https://discord.gg/YXfmSWuKQT" target="_blank"><img src="discord-logo.png">Discord</a>
+<a href="https://www.youtube.com/@daijoubuxix" target="_blank"><img src="youtube.png">YouTube</a>
+<a href="https://www.twitch.tv/daijoubuxix" target="_blank"><img src="twitch.png">Twitch</a>
+<a href="https://www.facebook.com/daijoubuacnh" target="_blank"><img src="facebook.png">Follow Me</a>
 </footer>
 
-<!-- Floating social icons -->
 <div class="floating-icons">
-  <img src="youtube.png" onclick="window.open('https://www.youtube.com/@daijoubuxix','_blank')">
-  <img src="twitch.png" onclick="window.open('https://www.twitch.tv/daijoubuxix','_blank')">
-  <img src="facebook.png" onclick="window.open('https://www.facebook.com/daijoubuacnh','_blank')">
+<img src="youtube.png" onclick="window.open('https://www.youtube.com/@daijoubuxix')">
+<img src="twitch.png" onclick="window.open('https://www.twitch.tv/daijoubuxix')">
+<img src="facebook.png" onclick="window.open('https://www.facebook.com/daijoubuacnh')">
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
 let userId = localStorage.getItem("queueUserId");
+let joinTime = null;
 
-function openAbout(){document.getElementById("rulesModal").style.display="block";}
-function closeRules(){document.getElementById("rulesModal").style.display="none";}
+function openAbout(){
+alert("Follow rules. Leave via airport. Click Leave Island when done.");
+}
 
 function showQueueUI(){
-  document.getElementById("login").style.display="none";
-  document.getElementById("queue").style.display="block";
-  document.getElementById("guestbook").style.display="block";
-  document.getElementById("turnipCard").style.display="block";
+document.getElementById("login").style.display="none";
+document.getElementById("queue").style.display="block";
+document.getElementById("guestbook").style.display="block";
+document.getElementById("turnipCard").style.display="block";
 }
 
+// LOGIN
 function login(){
-  const username = document.getElementById("username").value.trim();
-  const visitorIsland = document.getElementById("visitorIsland").value.trim();
-  const visitorPassword = document.getElementById("visitorPassword").value.trim();
-  if(!username||!visitorIsland||!visitorPassword){alert("Fill all fields"); return;}
+const username=usernameInput=document.getElementById("username").value.trim();
+const visitorIsland=document.getElementById("visitorIsland").value.trim();
+const visitorPassword=document.getElementById("visitorPassword").value.trim();
 
-  userId = crypto.randomUUID();
-  localStorage.setItem("queueUserId",userId);
-  showQueueUI();
-
-  socket.emit("joinQueue", {
-    userId,
-    username,
-    visitorIsland,
-    visitorPassword,
-    joinTime: new Date()
-  });
+if(!username||!visitorIsland||!visitorPassword){
+alert("Fill all fields");
+return;
 }
 
-// Queue updates
+fetch("/login",{method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({username,visitorIsland,password:visitorPassword})
+})
+.then(res=>res.json())
+.then(data=>{
+if(data.success){
+userId=crypto.randomUUID();
+localStorage.setItem("queueUserId",userId);
+showQueueUI();
+joinTime=Date.now();
+socket.emit("joinQueue",{userId,username,visitorIsland});
+}else{
+alert(data.msg||"Login failed");
+}
+});
+}
+
+// AUTO 10 MIN REMINDER
+setInterval(()=>{
+if(joinTime && Date.now()-joinTime>600000){
+alert("⏰ Please leave the island so others can join!");
+joinTime=null;
+}
+},60000);
+
+// LIVE STATUS UPDATE
+socket.on("islandStatusUpdate",data=>{
+document.getElementById("islandPassDisplay").innerText=data.islandPass;
+document.getElementById("dodoDisplay").innerText=data.dodoCode;
+document.getElementById("turnipDisplay").innerText=data.turnipPrice+" Bells";
+document.getElementById("timeDisplay").innerText=data.localTime;
+});
+
+// QUEUE UPDATE
 socket.on("queueUpdate",data=>{
-  const user = data.users.find(u=>u.userId===userId);
-  if(!user) return;
-  document.getElementById("position").innerText="Position: "+user.position;
-  const percent = (data.activeCount/7)*100;
-  const bar = document.getElementById("progressBar");
-  bar.style.width = percent+"%";
-  bar.style.background = data.activeCount>=7?"red":"green";
-  document.getElementById("progressText").innerText=data.activeCount+"/7 Visitors";
+document.getElementById("visitorCountDisplay").innerText=
+"Visitors on island: "+data.activeCount+"/7";
+const user=data.users.find(u=>u.userId===userId);
+if(!user) return;
 
-  if(user.active){
-    document.getElementById("status").innerText="🎉 You're on the island!";
-    document.getElementById("code").innerText="Dodo Code: "+user.dodoCodeDisplay;
-  } else {
-    document.getElementById("status").innerText="🌼 Waiting in queue...";
-    document.getElementById("code").innerText=user.dodoCodeDisplay;
-  }
-});
+document.getElementById("position").innerText="Position: "+user.position;
 
-// Guestbook
-function submitComment(){
-  const comment = document.getElementById("commentText").value.trim();
-  if(!comment) return alert("Write something!");
-  const username = document.getElementById("username").value.trim();
-  const island = document.getElementById("visitorIsland").value.trim();
-  socket.emit("newComment",{userId,username,island,comment});
-  document.getElementById("commentText").value="";
+const percent=(data.activeCount/7)*100;
+document.getElementById("progressBar").style.width=percent+"%";
+document.getElementById("progressText").innerText=data.activeCount+"/7 Visitors";
+
+if(user.active){
+document.getElementById("status").innerText="🎉 You're on the island!";
+document.getElementById("code").innerText="Dodo Code: "+user.dodoCodeDisplay;
+}else{
+document.getElementById("status").innerText="🌼 Waiting in queue...";
 }
-socket.on("updateComments",comments=>{
-  const box = document.getElementById("commentsList");
-  box.innerHTML="";
-  comments.forEach(c=>{
-    box.innerHTML+=`<div class="comment-item"><strong>${c.username}</strong> (${c.island})<br>${c.comment}</div>`;
-  });
 });
 
-// Copy Dodo
-document.getElementById("copyBtn").onclick=()=>{
-  const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
-  if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
-};
+// GUESTBOOK
+function submitComment(){
+const comment=document.getElementById("commentText").value.trim();
+if(!comment) return alert("Write something!");
+socket.emit("newComment",{userId,comment});
+document.getElementById("commentText").value="";
+}
 
-// Leave island
-document.getElementById("leaveBtn").onclick=()=>{
-  socket.emit("leaveIsland",userId);
-  localStorage.removeItem("queueUserId");
-  location.reload();
-};
-
-// Turnip Prices
-const turnipPriceEl = document.getElementById("turnipPrice");
-socket.on("turnipPriceUpdate", price=>{turnipPriceEl.innerText=`Today's price: ${price} Bells`;});
-
-// Reminder from server
-socket.on("reminderLeave", msg=>{alert(msg);});
+socket.on("updateComments",comments=>{
+const box=document.getElementById("commentsList");
+box.innerHTML="";
+comments.forEach(c=>{
+box.innerHTML+=`<div class="comment-item"><strong>${c.username}</strong><br>${c.comment}</div>`;
+});
+});
 </script>
 </body>
 </html>
