@@ -2,47 +2,62 @@ const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
+const path = require("path");
+const fs = require("fs");
+
 app.use(express.json());
-app.use(express.static("public")); // index.html, admin.html, logos, bg.jpg, etc.
+app.use(express.static(path.join(__dirname,"public")));
 
-let dodoCode = "JAJABOYAXIX"; // default Dodo code
-let islandPassword = "daijoubu";
-let queue = [];
+let users = [];
+const MAX_ACTIVE = 7;
+let dodoCode = "ABCD"; // replace with your island code
 
-app.post("/login", (req, res) => {
-    const { username, visitorIsland, visitorPassword } = req.body;
-    if(!username || !visitorIsland || !visitorPassword) return res.json({ success: false });
-    if(visitorPassword !== islandPassword) return res.json({ success: false });
-    res.json({ success: true });
+// Persistent guestbook
+const COMMENTS_FILE = path.join(__dirname,"comments.json");
+let comments = [];
+if(fs.existsSync(COMMENTS_FILE)){
+  try{ comments = JSON.parse(fs.readFileSync(COMMENTS_FILE)); }
+  catch(e){ comments = []; }
+}
+
+app.post("/login",(req,res)=>{
+  const { username,island,password } = req.body;
+  if(username && island && password) res.json({ success:true });
+  else res.json({ success:false });
 });
 
-io.on("connection", (socket) => {
-    socket.on("joinQueue", ({ userId, username, visitorIsland, visitorPassword }) => {
-        let visitor = { userId, username, visitorIsland, visitorPassword, active: false, position: queue.length + 1 };
-        queue.push(visitor);
-        updateQueue();
-    });
+io.on("connection",(socket)=>{
 
-    socket.on("leaveIsland", (userId) => {
-        queue = queue.filter(v => v.userId !== userId);
-        updateQueue();
-    });
-
-    socket.on("updateDodo", (newCode) => {
-        dodoCode = newCode;
-        io.emit("toastUpdate", "✅ Dodo code updated!"); // notify all visitors
-        updateQueue();
-    });
-
-    socket.on("updateIslandPassword", (newPass) => {
-        islandPassword = newPass;
-        io.emit("toastUpdate", "✅ Island password updated!"); // notify all visitors
-    });
-
-    function updateQueue() {
-        queue.forEach((v,i)=>v.active=i<7);
-        io.emit("queueUpdate", { users: queue, activeCount: queue.filter(v=>v.active).length, dodoCode });
+  socket.on("joinQueue",(data)=>{
+    if(!users.find(u=>u.userId===data.userId)){
+      users.push({...data,active:false,position:users.length+1});
+      updateQueue();
     }
+  });
+
+  socket.on("leaveIsland",(userId)=>{
+    users = users.filter(u=>u.userId!==userId);
+    updateQueue();
+  });
+
+  socket.on("newComment",(data)=>{
+    if(data.username && data.island && data.comment){
+      comments.unshift(data);
+      if(comments.length>100) comments.pop();
+      fs.writeFileSync(COMMENTS_FILE,JSON.stringify(comments,null,2));
+      io.emit("updateComments",comments);
+    }
+  });
+
+  socket.emit("updateComments",comments);
 });
 
-http.listen(3000, () => console.log("Server running on port 3000"));
+function updateQueue(){
+  users.forEach((u,i)=>{ u.position=i+1; });
+  users.forEach((u,i)=>{ u.active = i<MAX_ACTIVE; });
+  const activeCount = users.filter(u=>u.active).length;
+  io.emit("queueUpdate",{users,activeCount,dodoCode});
+}
+
+const PORT = process.env.PORT||3000;
+http.listen(PORT,()=>console.log(`Server running on port ${PORT}`));
