@@ -2,64 +2,35 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Island Admin Panel 🌸</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<title>Admin Panel 🌴</title>
+<link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Nunito', sans-serif; background: #dcedc1; text-align:center; padding:40px; }
-input { padding:8px; margin:10px 0; border-radius:8px; border:1px solid #ccc; width:60%; }
-button { padding:10px 20px; margin:10px; border-radius:10px; border:none; cursor:pointer; font-weight:bold; background:#ffb6b9; }
+body { font-family:'Linotte',sans-serif; text-align:center; background:#f0f8ff; padding:30px; }
+input, button { padding:10px; margin:5px; border-radius:8px; }
+button { cursor:pointer; font-weight:bold; background:#ffb6b9; border:none; }
 button:hover { background:#ff8b94; }
-.card { background:white; padding:25px; border-radius:20px; display:inline-block; box-shadow:0 8px 20px rgba(0,0,0,0.15); }
 </style>
 </head>
 <body>
+<h2>🌴 Admin Panel</h2>
+<p>Current island visitors: <span id="visitorCount">0</span>/7</p>
+<input id="dodoInput" placeholder="Enter new Dodo Code">
+<button onclick="updateDodo()">Update Dodo Code</button>
 
-<div class="card" id="loginDiv">
-    <h2>🌸 Admin Login</h2>
-    <input id="adminPassword" placeholder="Admin Password" type="password"><br>
-    <button onclick="adminLogin()">Login</button>
-</div>
-
-<div class="card" id="panelDiv" style="display:none;">
-    <h2>🎉 Admin Panel</h2>
-    <input id="newCode" placeholder="New Dodo Code"><br>
-    <button onclick="changeCode()">Update Dodo Code</button>
-    <p id="status"></p>
-</div>
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
-function adminLogin(){
-    const pw = document.getElementById("adminPassword").value;
-    fetch("/admin-login", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({password: pw})
-    }).then(res=>res.json())
-    .then(data=>{
-        if(data.success){
-            document.getElementById("loginDiv").style.display="none";
-            document.getElementById("panelDiv").style.display="block";
-        } else {
-            alert("Wrong admin password!");
-        }
-    });
-}
+const socket = io();
 
-function changeCode(){
-    const newCode = document.getElementById("newCode").value;
-    fetch("/change-code", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({code: newCode})
-    }).then(res=>{
-        if(res.status===200){
-            document.getElementById("status").innerText = "✅ Dodo Code updated!";
-        } else {
-            document.getElementById("status").innerText = "❌ Error updating code.";
-        }
-    });
+// Update visitor count live
+socket.on("queueUpdate", data=>{
+    document.getElementById("visitorCount").innerText = data.activeCount;
+});
+
+// Update Dodo code from admin input
+function updateDodo(){
+    const code = document.getElementById("dodoInput").value.trim();
+    if(code) socket.emit("updateDodo", code);
 }
 </script>
-
 </body>
 </html>
