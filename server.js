@@ -1,113 +1,145 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const session = require("express-session");
 const bodyParser = require("body-parser");
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
 app.use(session({
-    secret: "islandsecret",
-    resave: false,
-    saveUninitialized: true
+  secret: "islandsecret",
+  resave: false,
+  saveUninitialized: true
 }));
 
-// ==== ADMIN PASSWORD ====
-const ADMIN_PASSWORD = "youradminpassword";
+// =====================
+// ADMIN PASSWORD
+// =====================
+const ADMIN_PASSWORD = "jajaboyaxix";
 
-// ==== ISLAND DATA ====
+// =====================
+// ISLAND DATA
+// =====================
 let islandData = {
-    islandPass: "0000",
-    dodoCode: "AAAAA",
-    turnipPrice: "0",
-    islandName: "My Island",
-    localTime: "12:00 PM"
+  dodoCode: "AAAAA",
+  islandPass: "0000",
+  turnipPrice: "0",
+  localTime: "12:00 PM"
 };
 
-// ==== VISITORS (IP BASED) ====
-let visitors = [];
-let guestbook = [];
-
-// ===== ADMIN LOGIN =====
+// =====================
+// ADMIN LOGIN ROUTE
+// =====================
 app.post("/admin-login", (req, res) => {
-    if (req.body.password === ADMIN_PASSWORD) {
-        req.session.admin = true;
-        return res.json({ success: true });
-    }
-    res.json({ success: false });
+  if (req.body.password === ADMIN_PASSWORD) {
+    req.session.admin = true;
+    return res.json({ success: true });
+  }
+  res.json({ success: false });
 });
 
-// ===== CHECK ADMIN =====
-app.get("/check-admin", (req, res) => {
-    res.json({ admin: !!req.session.admin });
-});
-
-// ===== UPDATE ISLAND =====
-app.post("/update-island", (req, res) => {
-    if (!req.session.admin) return res.status(403).send("Unauthorized");
-
-    islandData = req.body;
-    res.json({ success: true });
-});
-
-// ===== GET ISLAND DATA =====
+// =====================
+// GET ISLAND DATA
+// =====================
 app.get("/island-data", (req, res) => {
-    res.json(islandData);
+  res.json(islandData);
 });
 
-// ===== JOIN QUEUE (IP LOCK) =====
-app.post("/join-queue", (req, res) => {
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+// =====================
+// UPDATE ISLAND (ADMIN ONLY)
+// =====================
+app.post("/update-island", (req, res) => {
+  if (!req.session.admin) {
+    return res.status(403).send("Unauthorized");
+  }
 
-    const existing = visitors.find(v => v.ip === ip);
-    if (existing) {
-        return res.json({ success: false, message: "You are already in queue." });
+  islandData.dodoCode = req.body.dodoCode || islandData.dodoCode;
+  islandData.islandPass = req.body.islandPass || islandData.islandPass;
+  islandData.turnipPrice = req.body.turnipPrice || islandData.turnipPrice;
+  islandData.localTime = req.body.localTime || islandData.localTime;
+
+  io.emit("islandStatusUpdate", islandData);
+
+  res.json({ success: true });
+});
+
+// =====================
+// QUEUE SYSTEM
+// =====================
+let queue = [];
+
+io.on("connection", (socket) => {
+
+  const ip =
+    socket.handshake.headers["x-forwarded-for"] ||
+    socket.handshake.address;
+
+  // JOIN QUEUE
+  socket.on("joinQueue", (data) => {
+
+    // 1 IP = 1 visitor
+    if (queue.find(u => u.ip === ip)) {
+      return;
     }
 
-    visitors.push({
-        ip,
-        playerName: req.body.playerName,
-        islandName: req.body.islandName,
-        joined: Date.now()
-    });
+    const user = {
+      userId: data.userId,
+      username: data.username,
+      visitorIsland: data.visitorIsland,
+      ip: ip,
+      joinedAt: new Date(),
+      active: false,
+      position: 0
+    };
 
-    res.json({ success: true });
+    queue.push(user);
+    updateQueue();
+  });
+
+  // LEAVE QUEUE
+  socket.on("leaveQueue", (userId) => {
+    queue = queue.filter(u => u.userId !== userId);
+    updateQueue();
+  });
+
+  // DISCONNECT AUTO REMOVE
+  socket.on("disconnect", () => {
+    queue = queue.filter(u => u.ip !== ip);
+    updateQueue();
+  });
+
 });
 
-// ===== LEAVE QUEUE =====
-app.post("/leave-queue", (req, res) => {
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    visitors = visitors.filter(v => v.ip !== ip);
-    res.json({ success: true });
+// =====================
+// UPDATE QUEUE LOGIC
+// =====================
+function updateQueue() {
+
+  const MAX_VISITORS = 7;
+
+  queue.forEach((user, index) => {
+    user.position = index + 1;
+    user.active = index < MAX_VISITORS;
+    user.dodoCodeDisplay = user.active ? islandData.dodoCode : "Waiting...";
+  });
+
+  const activeCount = queue.filter(u => u.active).length;
+
+  io.emit("queueUpdate", {
+    users: queue,
+    activeCount
+  });
+}
+
+// =====================
+// START SERVER
+// =====================
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
-
-// ===== GET VISITORS =====
-app.get("/visitors", (req, res) => {
-    res.json(visitors);
-});
-
-// ===== GUESTBOOK =====
-app.post("/guestbook", (req, res) => {
-    guestbook.push({
-        name: req.body.name,
-        message: req.body.message,
-        time: new Date().toLocaleString()
-    });
-    res.json({ success: true });
-});
-
-app.get("/guestbook", (req, res) => {
-    res.json(guestbook);
-});
-
-// ===== AUTO REMINDER AFTER 10 MINUTES =====
-setInterval(() => {
-    const now = Date.now();
-    visitors.forEach(v => {
-        if (now - v.joined > 600000) {
-            console.log("Visitor should leave:", v.ip);
-        }
-    });
-}, 60000);
-
-app.listen(3000, () => console.log("Server running"));
