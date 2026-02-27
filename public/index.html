@@ -5,45 +5,12 @@
 <title>Island Queue 🌴</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
-body {
-    font-family: 'Linotte', sans-serif;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    text-align: center;
-    background: url('bg.jpg') no-repeat center center fixed;
-    background-size: cover;
-}
-.card {
-    background: rgba(255, 255, 255, 0.85);
-    width: 360px;
-    margin: 60px auto;
-    padding: 30px;
-    border-radius: 25px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-button {
-    background: #ffb6b9;
-    border: none;
-    padding: 12px 22px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 10px;
-    transition: 0.2s;
-}
-button:hover { background: #ff8b94; }
-input {
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    width: 80%;
-    box-sizing: border-box;
-}
-@media (max-width: 500px) {
-    .card { width: 90%; margin: 40px auto; padding: 20px; }
-}
+body { font-family:'Linotte',sans-serif; margin:0; padding:0; text-align:center; background:url('bg.jpg') no-repeat center center fixed; background-size:cover;}
+.card { background: rgba(255,255,255,0.85); width:360px; margin:60px auto; padding:30px; border-radius:25px; box-shadow:0 10px 25px rgba(0,0,0,0.2);}
+button { background:#ffb6b9; border:none; padding:12px 22px; border-radius:12px; cursor:pointer; font-weight:bold; margin-top:10px; transition:0.2s;}
+button:hover{background:#ff8b94;}
+input {padding:10px; margin:8px 0; border-radius:10px; border:1px solid #ccc; width:80%; box-sizing:border-box;}
+@media(max-width:500px){.card{width:90%; margin:40px auto; padding:20px;}}
 </style>
 </head>
 <body>
@@ -52,8 +19,8 @@ input {
 <div class="card" id="login">
     <h2>🌴 Island Queue</h2>
     <input id="username" placeholder="Player Name"><br>
-    <input id="islandName" placeholder="Island Name"><br>
-    <input id="adminPassword" placeholder="Your Password" type="password"><br>
+    <input id="visitorIsland" placeholder="Island Name"><br>
+    <input id="visitorPassword" placeholder="Your Password" type="password"><br>
     <button onclick="login()">Join Queue</button>
 </div>
 
@@ -74,58 +41,54 @@ const socket = io();
 let userId;
 
 function login() {
-    const username = document.getElementById("username").value;
-    const islandName = document.getElementById("islandName").value;
-    const adminPassword = document.getElementById("adminPassword").value;
+    const username = document.getElementById("username").value.trim();
+    const visitorIsland = document.getElementById("visitorIsland").value.trim();
+    const visitorPassword = document.getElementById("visitorPassword").value.trim();
 
-    fetch("/login", {
+    if(!username || !visitorIsland || !visitorPassword){
+        alert("Please fill all fields");
+        return;
+    }
+
+    fetch("/login",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ username, islandName, adminPassword })
+        body: JSON.stringify({username, visitorIsland, visitorPassword})
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(res=>res.json())
+    .then(data=>{
         if(data.success){
             userId = crypto.randomUUID();
             document.getElementById("login").style.display="none";
             document.getElementById("queue").style.display="block";
-            socket.emit("joinQueue",{userId,username});
+            socket.emit("joinQueue",{userId, username, visitorIsland, visitorPassword});
         } else {
-            alert("Incorrect credentials! Make sure all 3 fields are correct.");
+            alert("Incorrect credentials! Make sure all fields are correct.");
         }
     });
 }
 
-// Update queue info live
+// Queue updates
 socket.on("queueUpdate",(data)=>{
-    document.getElementById("position").innerText = "Position: " + data.position;
-    document.getElementById("waitTime").innerText = data.estimatedWait > 0 ? "Estimated wait: " + data.estimatedWait + " minutes" : "";
-    document.getElementById("islandCount").innerText = "Island: " + data.activeCount + "/7 visitors";
+    const user = data.users.find(u=>u.userId === userId);
+    document.getElementById("position").innerText = user ? "Position: " + user.position : "";
+    document.getElementById("waitTime").innerText = user && user.position > 7 ? "Estimated wait: "+ ((user.position-7)*5) +" min" : "";
+    document.getElementById("islandCount").innerText = "Island: "+ data.activeCount +"/7 visitors";
 
-    if(data.active){
+    if(user && user.active){
         document.getElementById("status").innerText = "🎉 You're on the island!";
-        document.getElementById("code").innerText = "Dodo Code: " + data.dodoCode;
+        document.getElementById("code").innerText = "Dodo Code: "+ data.dodoCode;
     } else {
         document.getElementById("status").innerText = "🌼 Waiting in queue...";
         document.getElementById("code").innerText = "";
     }
 });
 
-// Keep connection alive
-setInterval(()=>{ if(userId) socket.emit("heartbeat",userId); },20000);
-
-// Leave island
 document.getElementById("leaveBtn").onclick = ()=>{ socket.emit("leaveIsland",userId); };
-
-// Copy Dodo Code button
 document.getElementById("copyBtn").onclick = ()=>{
     const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
-    if(code){
-        navigator.clipboard.writeText(code);
-        alert("Copied Dodo Code: " + code);
-    }
+    if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
 };
 </script>
 </body>
-</html>
 </html>
