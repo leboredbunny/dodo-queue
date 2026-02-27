@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Island Queue 🌴</title>
+<link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: 'Linotte', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    text-align: center;
+
+    /* Background photo */
+    background: url('bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Card styling */
+.card {
+    background: rgba(255, 255, 255, 0.85); /* semi-transparent */
+    width: 360px;
+    margin: 60px auto;
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+button {
+    background: #ffb6b9;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+button:hover { background: #ff8b94; }
+
+input {
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    width: 80%;
+    box-sizing: border-box;
+}
+
+/* Responsive for mobile */
+@media (max-width: 500px) {
+    .card { width: 90%; margin: 40px auto; padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Login Card -->
+<div class="card" id="login">
+    <h2>🌴 Island Queue</h2>
+    <input id="username" placeholder="Player Name"><br>
+    <input id="password" placeholder="Island Name" type="password"><br>
+    <button onclick="login()">Join Queue</button>
+</div>
+
+<!-- Queue Card -->
+<div class="card" id="queue" style="display:none;">
+    <h2 id="status"></h2>
+    <p id="position"></p>
+    <p id="waitTime"></p>
+    <p id="islandCount"></p> <!-- Island occupancy -->
+    <h3 id="code"></h3>
+    <button id="copyBtn">📋 Copy Dodo Code</button><br>
+    <button id="leaveBtn">Leave Island</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+let userId;
+let username;
+
+function login() {
+    username = document.getElementById("username").value;
+
+    fetch("/login", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            username,
+            password:document.getElementById("password").value
+        })
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.success){
+            userId = crypto.randomUUID();
+            document.getElementById("login").style.display="none";
+            document.getElementById("queue").style.display="block";
+            socket.emit("joinQueue",{userId,username});
+        } else {
+            alert("Wrong island name!");
+        }
+    });
+}
+
+// Update queue info live
+socket.on("queueUpdate",(data)=>{
+    document.getElementById("position").innerText =
+        "Position: " + data.position;
+
+    document.getElementById("waitTime").innerText =
+        data.estimatedWait > 0
+        ? "Estimated wait: " + data.estimatedWait + " minutes"
+        : "";
+
+    document.getElementById("islandCount").innerText =
+        "Island: " + data.activeCount + "/7 visitors";
+
+    if(data.active){
+        document.getElementById("status").innerText =
+            "🎉 You're on the island!";
+        document.getElementById("code").innerText =
+            "Dodo Code: " + data.dodoCode;
+    } else {
+        document.getElementById("status").innerText =
+            "🌼 Waiting in queue...";
+        document.getElementById("code").innerText = "";
+    }
+});
+
+// Keep connection alive
+setInterval(()=>{
+    if(userId) socket.emit("heartbeat",userId);
+},20000);
+
+// Leave island
+document.getElementById("leaveBtn").onclick=()=>{
+    socket.emit("leaveIsland",userId);
+};
+
+// Copy Dodo Code button
+document.getElementById("copyBtn").onclick=()=>{
+    const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
+    if(code){
+        navigator.clipboard.writeText(code);
+        alert("Copied Dodo Code: " + code);
+    }
+};
+</script>
+
+</body>
+</html>
