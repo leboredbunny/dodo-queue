@@ -1,120 +1,71 @@
 const express = require("express");
 const http = require("http");
-const { Server } = require("socket.io");
-const session = require("express-session");
-const { v4: uuidv4 } = require("uuid");
-const fetch = require("node-fetch");
+const socketio = require("socket.io");
+const bodyParser = require("body-parser");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = socketio(server);
 
-const MAX_ACTIVE = 7;
-const ADMIN_PASSWORD = "jajaboyaxix";
-const USER_PASSWORD = "daijoubu";
-const INACTIVE_LIMIT = 5 * 60 * 1000;
-const AVG_VISIT_TIME = 10;
-
-let dodoCode = "ABC123";
-let queue = [];
-
-app.use(express.json());
-app.use(session({
-    secret: "secret-key",
-    resave: false,
-    saveUninitialized: true
-}));
-
+app.use(bodyParser.json());
 app.use(express.static("public"));
 
-app.post("/login", (req, res) => {
-    const { username, password } = req.body;
-    if (password !== USER_PASSWORD) return res.json({ success: false });
+let queue = [];
+let dodoCode = "AAAA"; // default Dodo code
 
-    req.session.userId = uuidv4();
-    req.session.username = username;
-    res.json({ success: true });
-});
+// Login route
+app.post("/login", (req,res)=>{
+    const { username, islandName, adminPassword } = req.body;
+    const correctIsland = "daijoubu";       // Island Name password
+    const correctAdmin = "jajaboyaxix";     // Admin password
 
-app.post("/admin-login", (req, res) => {
-    if (req.body.password === ADMIN_PASSWORD) {
-        req.session.admin = true;
-        return res.json({ success: true });
+    if(islandName === correctIsland && adminPassword === correctAdmin){
+        res.json({ success:true });
+    } else {
+        res.json({ success:false });
     }
-    res.json({ success: false });
 });
 
-app.post("/change-code", (req, res) => {
-    if (!req.session.admin) return res.sendStatus(403);
-    dodoCode = req.body.code;
-    updateQueue();
-    res.sendStatus(200);
-});
-
-io.on("connection", (socket) => {
-
-    socket.on("joinQueue", (data) => {
-        if (queue.find(u => u.id === data.userId)) return;
-
-        queue.push({
-            id: data.userId,
-            socketId: socket.id,
-            username: data.username,
-            lastActive: Date.now()
-        });
-
+// Socket.io handling
+io.on("connection", socket=>{
+    socket.on("joinQueue", data=>{
+        if(!queue.find(u=>u.userId===data.userId)){
+            queue.push({ userId:data.userId, username:data.username, active:false });
+        }
         updateQueue();
     });
 
-    socket.on("heartbeat", (userId) => {
-        const user = queue.find(u => u.id === userId);
-        if (user) user.lastActive = Date.now();
+    socket.on("heartbeat", userId=>{
+        // could track activity if needed
     });
 
-    socket.on("leaveIsland", (userId) => {
-        removeUser(userId);
+    socket.on("leaveIsland", userId=>{
+        const user = queue.find(u=>u.userId===userId);
+        if(user) user.active=false;
+        updateQueue();
     });
 
-    socket.on("disconnect", () => {
-        queue = queue.filter(u => u.socketId !== socket.id);
+    socket.on("updateDodo", code=>{
+        dodoCode = code;
         updateQueue();
     });
 });
 
-setInterval(() => {
-    const now = Date.now();
-    queue = queue.filter(u => now - u.lastActive < INACTIVE_LIMIT);
-    updateQueue();
-}, 30000);
+function updateQueue(){
+    const activeUsers = queue.filter(u=>u.active).length;
+    queue.forEach((user,index)=>{
+        // Activate first 7 people if slots free
+        if(index < 7) queue[index].active = true;
+        else queue[index].active = false;
 
-function removeUser(userId) {
-    queue = queue.filter(u => u.id !== userId);
-    updateQueue();
-}
-
-function updateQueue() {
-    const activeUsers = queue.slice(0, MAX_ACTIVE);
-
-    io.sockets.sockets.forEach((socket) => {
-        const user = queue.find(u => u.socketId === socket.id);
-        if (!user) return;
-
-        const position = queue.findIndex(u => u.id === user.id);
-        const estimatedWait =
-            position >= MAX_ACTIVE
-            ? Math.ceil((position - MAX_ACTIVE + 1) * AVG_VISIT_TIME)
-            : 0;
-
-        socket.emit("queueUpdate", {
-            position: position + 1,
-            active: activeUsers.find(u => u.id === user.id),
-            dodoCode: activeUsers.find(u => u.id === user.id) ? dodoCode : null,
-            estimatedWait
+        io.to(user.userId).emit("queueUpdate", {
+            position: index+1,
+            estimatedWait: Math.max(0,(index-7)*5),
+            active: queue[index].active,
+            dodoCode: dodoCode,
+            activeCount: activeUsers
         });
     });
 }
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
-});
+server.listen(3000, ()=>console.log("Server running on port 3000"));
