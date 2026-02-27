@@ -2,60 +2,29 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>🪻Daijoubu's Private Island Queue 🏝</title>
+<title>🪻Daijoubu's Island Queue 🌴</title>
 <link href="https://fonts.googleapis.com/css2?family=Linotte:wght@600&display=swap" rel="stylesheet">
 <style>
-body {
-    font-family:'Linotte',sans-serif;
-    margin:0; padding:0; text-align:center;
-    background:url('bg.jpg') no-repeat center center fixed;
-    background-size:cover;
-}
-.card {
-    background: rgba(255,255,255,0.85);
-    width:360px; margin:60px auto; padding:30px;
-    border-radius:25px; box-shadow:0 10px 25px rgba(0,0,0,0.2);
-}
-input {padding:10px; margin:8px 0; border-radius:10px; border:1px solid #ccc; width:80%; box-sizing:border-box;}
-button {background:#ffb6b9; border:none; padding:12px 22px; border-radius:12px; cursor:pointer; font-weight:bold; margin-top:10px; transition:0.2s;}
+body {font-family:'Linotte',sans-serif;margin:0;padding:0;text-align:center;background:url('bg.jpg') no-repeat center center fixed;background-size:cover;}
+.card{background: rgba(255,255,255,0.85);width:360px;margin:60px auto;padding:30px;border-radius:25px;box-shadow:0 10px 25px rgba(0,0,0,0.2);}
+input{padding:10px;margin:8px 0;border-radius:10px;border:1px solid #ccc;width:80%;box-sizing:border-box;}
+button{background:#ffb6b9;border:none;padding:12px 22px;border-radius:12px;cursor:pointer;font-weight:bold;margin-top:10px;transition:0.2s;}
 button:hover{background:#ff8b94;}
-@media(max-width:500px){.card{width:90%; margin:40px auto; padding:20px;}}
+@media(max-width:500px){.card{width:90%;margin:40px auto;padding:20px;}}
 
-/* Modal Styles */
-#rulesModal {
-    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.7); z-index:9999; text-align:center;
-}
-#rulesModal div {
-    background:#fff; padding:30px; border-radius:20px;
-    margin:100px auto; width:90%; max-width:400px; box-shadow:0 10px 20px rgba(0,0,0,0.3);
-    cursor: move;
-}
-#rulesModal button{border:none; padding:12px 20px; border-radius:12px; background:#ffb6b9; cursor:pointer; font-weight:bold; transition:0.2s;}
+#rulesModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background: rgba(0,0,0,0.7);z-index:9999;text-align:center;}
+#rulesModal div{background:#fff;padding:30px;border-radius:20px;margin:100px auto;width:90%;max-width:400px;box-shadow:0 10px 20px rgba(0,0,0,0.3);cursor:move;}
+#rulesModal button{border:none;padding:12px 20px;border-radius:12px;background:#ffb6b9;cursor:pointer;font-weight:bold;transition:0.2s;}
 #rulesModal button:hover{ background:#ff8b94; }
 #rulesModal a { color:#ff8b94; font-weight:bold; text-decoration:none; }
 #rulesModal a:hover { text-decoration:underline; }
 
-/* Social buttons */
-a button {
-    padding:10px 16px; background:#ffd700; color:#000; border:none; border-radius:12px;
-    font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center;
-}
-a button:hover { background:#ffcc00; }
-a img { display:block; margin-right:5px; }
+a button{padding:10px 16px;background:#ffd700;color:#000;border:none;border-radius:12px;font-weight:bold;cursor:pointer;transition:0.2s;display:flex;align-items:center;}
+a button:hover{ background:#ffcc00; }
+a img{display:block;margin-right:5px;}
 
-/* Toast messages */
-.toast{
-    position:fixed; top:20px; right:20px; background:#4CAF50; color:#fff;
-    padding:12px 20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); z-index:10000;
-    animation:fadeinout 3s forwards;
-}
-@keyframes fadeinout{
-    0%{opacity:0; transform:translateY(-20px);}
-    10%{opacity:1; transform:translateY(0);}
-    90%{opacity:1;}
-    100%{opacity:0; transform:translateY(-20px);}
-}
+.toast{position:fixed;top:20px;right:20px;background:#4CAF50;color:#fff;padding:12px 20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,0.3);z-index:10000;animation:fadeinout 3s forwards;}
+@keyframes fadeinout{0%{opacity:0; transform:translateY(-20px);}10%{opacity:1; transform:translateY(0);}90%{opacity:1;}100%{opacity:0; transform:translateY(-20px);}}
 </style>
 </head>
 <body>
@@ -78,25 +47,18 @@ a img { display:block; margin-right:5px; }
 
 <!-- Login Card -->
 <div class="card" id="login">
-    <h2>🌴 Island Queue</h2>
+    <h2>🪻Daijoubu's Island Queue 🌴</h2>
     <input id="username" placeholder="Player Name"><br>
     <input id="visitorIsland" placeholder="Island Name"><br>
     <input id="visitorPassword" placeholder="Your Password" type="password"><br>
-    <button onclick="login()">Join Queue</button>
+    <button onclick="login()">Join Island Queue</button>
 
-    <!-- Social Buttons -->
     <div style="margin-top:15px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-        <a href="https://ko-fi.com/daijoubuxix" target="_blank" style="text-decoration:none;">
-            <button style="display:flex; align-items:center; gap:8px;">
-                <img src="kofi-logo.png" alt="Ko-fi" width="24" height="24">
-                ☕ Private Treasure Islands
-            </button>
+        <a href="https://ko-fi.com/daijoubuxix/tiers" target="_blank">
+            <button style="display:flex; align-items:center; gap:8px;"><img src="kofi-logo.png" width="24" height="24">☕ Private Treasure Islands</button>
         </a>
-        <a href="https://discord.gg/YXfmSWuKQT" target="_blank" style="text-decoration:none;">
-            <button style="display:flex; align-items:center; gap:8px;">
-                <img src="discord-logo.png" alt="Discord" width="24" height="24">
-                💬 Join my Community
-            </button>
+        <a href="https://discord.gg/YXfmSWuKQT" target="_blank">
+            <button style="display:flex; align-items:center; gap:8px;"><img src="discord-logo.png" width="24" height="24">💬 Join my Community</button>
         </a>
     </div>
 </div>
@@ -118,111 +80,96 @@ const socket = io();
 let userId;
 let countdownInterval;
 
-// Show rules modal once per visitor and make it draggable
+// Show rules modal once and make draggable
 window.onload = () => {
-    if(!localStorage.getItem("rulesSeen")) {
+    if(!localStorage.getItem("rulesSeen")){
         const modal = document.getElementById("rulesModal");
-        modal.style.display = "block";
+        modal.style.display="block";
         makeDraggable(modal.querySelector("div"));
     }
 };
 
-// Close rules modal
-function closeRules() {
-    document.getElementById("rulesModal").style.display = "none";
-    localStorage.setItem("rulesSeen", "true");
+// Rules modal
+function closeRules(){
+    document.getElementById("rulesModal").style.display="none";
+    localStorage.setItem("rulesSeen","true");
 }
-
-// Draggable function
-function makeDraggable(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+function makeDraggable(elmnt){
+    let pos1=0,pos2=0,pos3=0,pos4=0;
     elmnt.onmousedown = dragMouseDown;
-    function dragMouseDown(e) {
+    function dragMouseDown(e){
         e = e || window.event; e.preventDefault();
         pos3 = e.clientX; pos4 = e.clientY;
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
     }
-    function elementDrag(e) {
-        e = e || window.event; e.preventDefault();
-        pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
-        pos3 = e.clientX; pos4 = e.clientY;
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-        elmnt.style.position = "absolute";
+    function elementDrag(e){
+        e=e||window.event;e.preventDefault();
+        pos1=pos3-e.clientX; pos2=pos4-e.clientY;
+        pos3=e.clientX; pos4=e.clientY;
+        elmnt.style.top=(elmnt.offsetTop-pos2)+"px";
+        elmnt.style.left=(elmnt.offsetLeft-pos1)+"px";
+        elmnt.style.position="absolute";
     }
-    function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
-    }
+    function closeDragElement(){document.onmouseup=null;document.onmousemove=null;}
 }
 
 // Login
-function login() {
-    const username = document.getElementById("username").value.trim();
-    const visitorIsland = document.getElementById("visitorIsland").value.trim();
-    const visitorPassword = document.getElementById("visitorPassword").value.trim();
-    if(!username || !visitorIsland || !visitorPassword){
-        alert("Please fill all fields");
-        return;
-    }
-    fetch("/login",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({username, visitorIsland, visitorPassword})
-    })
-    .then(res=>res.json())
-    .then(data=>{
+function login(){
+    const username=document.getElementById("username").value.trim();
+    const visitorIsland=document.getElementById("visitorIsland").value.trim();
+    const visitorPassword=document.getElementById("visitorPassword").value.trim();
+    if(!username||!visitorIsland||!visitorPassword){alert("Please fill all fields");return;}
+    fetch("/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,visitorIsland,visitorPassword})})
+    .then(res=>res.json()).then(data=>{
         if(data.success){
-            userId = crypto.randomUUID();
+            userId=crypto.randomUUID();
             document.getElementById("login").style.display="none";
             document.getElementById("queue").style.display="block";
-            socket.emit("joinQueue",{userId, username, visitorIsland, visitorPassword});
-        } else {
-            alert("Incorrect credentials! Make sure all fields are correct.");
-        }
+            socket.emit("joinQueue",{userId,username,visitorIsland,visitorPassword});
+        }else alert("Incorrect credentials! Make sure all fields are correct.");
     });
 }
 
 // Queue updates
-socket.on("queueUpdate", (data) => {
-    const user = data.users.find(u => u.userId === userId);
-    document.getElementById("position").innerText = user ? "Position: " + user.position : "";
-    document.getElementById("islandCount").innerText = "Island: " + data.activeCount + "/7 visitors";
-
-    if (countdownInterval) clearInterval(countdownInterval);
-
-    if (user) {
-        if (user.active) {
-            document.getElementById("status").innerText = "🎉 You're on the island!";
-            document.getElementById("code").innerText = "Dodo Code: " + data.dodoCode;
-            document.getElementById("waitTime").innerText = "";
-        } else {
-            document.getElementById("status").innerText = "🌼 Waiting in queue...";
-            document.getElementById("code").innerText = "";
-
-            let waitSeconds = Math.max(0, (user.position - 7) * 5 * 60);
-            countdownInterval = setInterval(() => {
-                let minutes = Math.floor(waitSeconds / 60);
-                let seconds = waitSeconds % 60;
-                document.getElementById("waitTime").innerText = `Estimated wait: ${minutes}m ${seconds}s`;
-                if (waitSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                    document.getElementById("waitTime").innerText = "You are next!";
-                }
-                waitSeconds--;
-            }, 1000);
-        }
+socket.on("queueUpdate",(data)=>{
+    const user=data.users.find(u=>u.userId===userId);
+    if(!user) return;
+    document.getElementById("position").innerText="Position: "+user.position;
+    document.getElementById("islandCount").innerText="Island: "+data.activeCount+"/7 visitors";
+    if(countdownInterval) clearInterval(countdownInterval);
+    if(user.active){
+        document.getElementById("status").innerText="🎉 You're on the island!";
+        document.getElementById("code").innerText="Dodo Code: "+data.dodoCode;
+        document.getElementById("waitTime").innerText="";
+    } else {
+        document.getElementById("status").innerText="🌼 Waiting in queue...";
+        document.getElementById("code").innerText="";
+        let waitSeconds=Math.max(0,(user.position-7)*5*60);
+        countdownInterval=setInterval(()=>{
+            let minutes=Math.floor(waitSeconds/60);
+            let seconds=waitSeconds%60;
+            document.getElementById("waitTime").innerText=`Estimated wait: ${minutes}m ${seconds}s`;
+            if(waitSeconds<=0){clearInterval(countdownInterval);document.getElementById("waitTime").innerText="You are next!";}
+            waitSeconds--;
+        },1000);
     }
 });
 
+// Toast notifications
+socket.on("toastUpdate",(msg)=>{
+    const toast=document.createElement("div");
+    toast.className="toast"; toast.innerText=msg;
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(),3000);
+});
+
 // Buttons
-document.getElementById("leaveBtn").onclick = ()=>{ socket.emit("leaveIsland",userId); };
-document.getElementById("copyBtn").onclick = ()=>{
-    const code = document.getElementById("code").innerText.replace("Dodo Code: ","");
+document.getElementById("copyBtn").onclick=()=>{
+    const code=document.getElementById("code").innerText.replace("Dodo Code: ","");
     if(code) navigator.clipboard.writeText(code).then(()=>alert("Copied: "+code));
 };
+document.getElementById("leaveBtn").onclick=()=>{socket.emit("leaveIsland",userId);};
 </script>
-
 </body>
 </html>
