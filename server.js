@@ -2,39 +2,34 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const session = require("express-session");
-const bodyParser = require("body-parser");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(express.static("public"));
 
 app.use(session({
-  secret: "islandsecret",
+  secret: "supersecretislandkey",
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false
 }));
 
-// =====================
-// ADMIN PASSWORD
-// =====================
 const ADMIN_PASSWORD = "jajaboyaxix";
 
-// =====================
-// ISLAND DATA
-// =====================
 let islandData = {
-  dodoCode: "AAAAA",
-  islandPass: "0000",
+  dodoCode: "-----",
+  islandPass: "----",
   turnipPrice: "0",
   localTime: "12:00 PM"
 };
 
-// =====================
-// ADMIN LOGIN ROUTE
-// =====================
+let queue = [];
+const MAX_VISITORS = 7;
+
+/* ================= ADMIN LOGIN ================= */
+
 app.post("/admin-login", (req, res) => {
   if (req.body.password === ADMIN_PASSWORD) {
     req.session.admin = true;
@@ -43,35 +38,27 @@ app.post("/admin-login", (req, res) => {
   res.json({ success: false });
 });
 
-// =====================
-// GET ISLAND DATA
-// =====================
+app.get("/admin-check", (req, res) => {
+  res.json({ loggedIn: !!req.session.admin });
+});
+
+/* ================= ISLAND DATA ================= */
+
 app.get("/island-data", (req, res) => {
   res.json(islandData);
 });
 
-// =====================
-// UPDATE ISLAND (ADMIN ONLY)
-// =====================
 app.post("/update-island", (req, res) => {
-  if (!req.session.admin) {
-    return res.status(403).send("Unauthorized");
-  }
+  if (!req.session.admin) return res.status(403).send("Unauthorized");
 
-  islandData.dodoCode = req.body.dodoCode || islandData.dodoCode;
-  islandData.islandPass = req.body.islandPass || islandData.islandPass;
-  islandData.turnipPrice = req.body.turnipPrice || islandData.turnipPrice;
-  islandData.localTime = req.body.localTime || islandData.localTime;
-
-  io.emit("islandStatusUpdate", islandData);
+  islandData = { ...islandData, ...req.body };
+  io.emit("islandUpdate", islandData);
+  updateQueue();
 
   res.json({ success: true });
 });
 
-// =====================
-// QUEUE SYSTEM
-// =====================
-let queue = [];
+/* ================= QUEUE ================= */
 
 io.on("connection", (socket) => {
 
@@ -79,20 +66,15 @@ io.on("connection", (socket) => {
     socket.handshake.headers["x-forwarded-for"] ||
     socket.handshake.address;
 
-  // JOIN QUEUE
   socket.on("joinQueue", (data) => {
 
-    // 1 IP = 1 visitor
-    if (queue.find(u => u.ip === ip)) {
-      return;
-    }
+    if (queue.find(u => u.ip === ip)) return;
 
     const user = {
-      userId: data.userId,
+      id: socket.id,
       username: data.username,
-      visitorIsland: data.visitorIsland,
-      ip: ip,
-      joinedAt: new Date(),
+      island: data.island,
+      ip,
       active: false,
       position: 0
     };
@@ -101,45 +83,26 @@ io.on("connection", (socket) => {
     updateQueue();
   });
 
-  // LEAVE QUEUE
-  socket.on("leaveQueue", (userId) => {
-    queue = queue.filter(u => u.userId !== userId);
-    updateQueue();
-  });
-
-  // DISCONNECT AUTO REMOVE
   socket.on("disconnect", () => {
-    queue = queue.filter(u => u.ip !== ip);
+    queue = queue.filter(u => u.id !== socket.id);
     updateQueue();
   });
 
 });
 
-// =====================
-// UPDATE QUEUE LOGIC
-// =====================
 function updateQueue() {
-
-  const MAX_VISITORS = 7;
 
   queue.forEach((user, index) => {
     user.position = index + 1;
     user.active = index < MAX_VISITORS;
-    user.dodoCodeDisplay = user.active ? islandData.dodoCode : "Waiting...";
   });
-
-  const activeCount = queue.filter(u => u.active).length;
 
   io.emit("queueUpdate", {
     users: queue,
-    activeCount
+    islandData
   });
 }
 
-// =====================
-// START SERVER
-// =====================
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-});
+server.listen(process.env.PORT || 3000, () =>
+  console.log("Server running")
+);
